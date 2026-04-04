@@ -57,6 +57,11 @@ const OnboardingGuard = () => {
   
   if (loading) return null;
 
+  // Unauthenticated users must start at the onboarding splash page
+  if (!user) {
+    return <Navigate to="/onboarding" replace />;
+  }
+
   // If signed in but profile hasn't loaded yet, wait.
   // profile is only null if signed out or still initializing.
   if (user && !profile) return null;
