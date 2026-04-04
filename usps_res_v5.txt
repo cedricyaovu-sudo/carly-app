@@ -1,0 +1,15 @@
+
+
+--- FOR: 123 Fake Street, Seattle, WA ---
+URL: https://api.usps.com/addresses/v3/address?streetAddress=123+Fake+Street&city=Seattle&state=WA
+Status: 400
+Body: 
+            {
+                "apiVersion": "/addresses/v3/",
+                "error": {
+                    "code": "400",
+                    "message": "Address Not Found",
+                    "errors": [{"title":"Address Not Found","detail":"","code":"010005"}]
+                }
+            }
+        

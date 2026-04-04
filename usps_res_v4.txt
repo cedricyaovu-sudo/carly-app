@@ -1,0 +1,36 @@
+
+
+--- FOR: 123 Fake Street, Faketown, FK ---
+URL: https://api.usps.com/addresses/v3/address?streetAddress=123+Fake+Street&city=Faketown&state=FK
+Status: 400
+Body: 
+            {
+                "apiVersion": "/addresses/v3/",
+                "error": {
+                    "code": "400",
+                    "message": "OASValidation OpenAPI-Spec-Validation-Addresses-Request with resource oas://addresses_v3.yaml: failed with reason: [ERROR - ECMA 262 regex ^(AA|AE|AL|AK|AP|AS|AZ|AR|CA|CO|CT|DE|DC|FM|FL|GA|GU|HI|ID|IL|IN|IA|KS|KY|LA|ME|MH|MD|MA|MI|MN|MS|MO|MP|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PW|PA|PR|RI|SC|SD|TN|TX|UT|VT|VI|VA|WA|WV|WI|WY)$ does not match input string FK: []]",
+                    "errors": []
+                }
+            }
+        
+
+
+--- FOR: asdfasdfasdf ---
+URL: https://api.usps.com/addresses/v3/address?streetAddress=asdfasdfasdf
+Status: 400
+Body: 
+            {
+                "apiVersion": "/addresses/v3/",
+                "error": {
+                    "code": "400",
+                    "message": "OASValidation OpenAPI-Spec-Validation-Addresses-Request with resource oas://addresses_v3.yaml: failed with reason: [ERROR - Query parameter 'state' is required on path '/address' but not found in request.: []]",
+                    "errors": []
+                }
+            }
+        
+
+
+--- FOR: 1600 Pennsylvania Ave NW, Washington, DC 20500 ---
+URL: https://api.usps.com/addresses/v3/address?streetAddress=1600+Pennsylvania+Ave+NW&city=Washington&state=DC&ZIPCode=20500
+Status: 200
+Body: {"firm":null,"address":{"streetAddress":"1600 PENNSYLVANIA AVE NW","streetAddressAbbreviation":"1600 PENNSYLVANIA AVE NW","secondaryAddress":null,"cityAbbreviation":"WASHINGTON","city":"WASHINGTON","state":"DC","ZIPCode":"20500","ZIPPlus4":"0005","urbanization":null,"postalCode":null,"country":null,"province":null,"countryISOCode":null},"additionalInfo":{"deliveryPoint":"00","carrierRoute":"C000","DPVConfirmation":"Y","DPVCMRA":"N","business":"Y","centralDeliveryPoint":null,"vacant":"N"},"corrections":null,"matches":[{"code":"31","text":"Single Response - exact match"}]}

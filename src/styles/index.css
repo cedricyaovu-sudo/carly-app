@@ -1,0 +1,290 @@
+:root {
+  /* Colors */
+  --color-primary: #007AFF;
+  --color-primary-hover: #0056b3;
+  --color-primary-light: rgba(0, 122, 255, 0.1);
+  --color-success: #10b981;
+  --color-success-background: #10b98120;
+  --color-danger: #ef4444;
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f1f5f9;
+  --color-text: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94a3b8;
+  --color-border: #e2e8f0;
+  --color-input-bg: #f1f5f9;
+
+  /* Typography */
+  --font-family: 'Inter', -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-size-base: 16px;
+  --font-size-sm: 14px;
+  --font-size-lg: 18px;
+  --font-size-xl: 24px;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 600;
+  --font-weight-heavy: 700;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* BorderRadius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] {
+  --color-background: #0B1121;
+  --color-surface: #151E32;
+  --color-text-heading: #FFFFFF;
+  --color-text-body: #94A3B8;
+  --color-border: #2A3650;
+  --color-input-bg: #1E293B;
+  --color-primary: #00C2CB;
+  --color-primary-hover: #00A8B0;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--color-background);
+  color: var(--color-text-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+  /* Prevent rubber-banding which can feel jumpy */
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--color-text-heading);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+/* Utilities */
+.container {
+  max-width: 565px;
+  /* Mobile-first constraint */
+  margin: 0 auto;
+  padding: 0;
+  /* Remove default padding here, handle in children */
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: var(--color-background);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.page-content {
+  flex: 1;
+  padding: var(--spacing-md);
+  padding-bottom: 120px;
+  /* Space for fixed navigation/footers */
+  display: flex;
+  flex-direction: column;
+}
+
+.page-content.with-fixed-footer {
+  padding-bottom: 200px;
+  /* Extra space to clear the floating action buttons + bottom nav */
+}
+
+.card {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md);
+  border-radius: var(--radius-full);
+  /* Pill shape */
+  font-weight: var(--font-weight-bold);
+  width: 100%;
+  transition: none;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-heading);
+}
+
+/* Mobile-first responsive utilities */
+@media (min-width: 481px) {
+  .container {
+    max-width: 565px;
+    padding: var(--spacing-lg);
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 600px;
+  }
+}
+
+/* Touch-friendly sizing */
+button,
+a,
+input[type="button"],
+input[type="submit"] {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+input,
+select,
+textarea {
+  font-size: 16px;
+  /* Prevents iOS zoom on focus */
+  touch-action: manipulation;
+}
+
+/* Safe area for notched devices */
+.container {
+  padding-bottom: env(safe-area-inset-bottom, var(--spacing-md));
+}
+
+/* Instant scrolling */
+html {
+  scroll-behavior: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+  /* Prevent layout shift when scrollbars appear */
+}
+
+.skeleton {
+  background: #f3f4f6;
+  border-radius: var(--radius-md);
+}
+
+/* Transitions disabled globally */
+*,
+*::before,
+*::after {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Disable user select on UI elements for cleaner touch experience */
+button,
+.btn {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Focus visible for accessibility */
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Hide outline for touch */
+button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 448px;
+  /* Aligns with content area (16px horizontal padding each side) */
+  height: 74px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--radius-lg);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 1000;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+@media (min-width: 481px) {
+  .bottom-nav {
+    width: calc(100% - 48px);
+    max-width: 472px;
+    /* 565px container - 48px padding (24px each side) */
+  }
+}
+
+@media (min-width: 768px) {
+  .bottom-nav {
+    max-width: 552px;
+    /* 600px container - 48px padding */
+  }
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.bottom-nav-item span {
+  font-size: 10px;
+  font-weight: 600;
+}

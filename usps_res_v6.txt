@@ -1,0 +1,15 @@
+
+
+--- FOR PARTIAL: 1600 Penns ---
+URL: https://api.usps.com/addresses/v3/address?streetAddress=1600+Penns
+Status: 400
+Body: 
+            {
+                "apiVersion": "/addresses/v3/",
+                "error": {
+                    "code": "400",
+                    "message": "OASValidation OpenAPI-Spec-Validation-Addresses-Request with resource oas://addresses_v3.yaml: failed with reason: [ERROR - Query parameter 'state' is required on path '/address' but not found in request.: []]",
+                    "errors": []
+                }
+            }
+        

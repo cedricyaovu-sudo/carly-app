@@ -1,0 +1,40 @@
+
+
+--- FOR: 123 Fake Street, Faketown, FK ---
+Status: 400
+
+            {
+                "apiVersion": "/addresses/v3/",
+                "error": {
+                    "code": "400",
+                    "message": "OASValidation OpenAPI-Spec-Validation-Addresses-Request with resource oas://addresses_v3.yaml: failed with reason: [ERROR - Query parameter 'state' is required on path '/address' but not found in request.: []]",
+                    "errors": []
+                }
+            }
+        
+
+--- FOR: asdfasdfasdf ---
+Status: 400
+
+            {
+                "apiVersion": "/addresses/v3/",
+                "error": {
+                    "code": "400",
+                    "message": "OASValidation OpenAPI-Spec-Validation-Addresses-Request with resource oas://addresses_v3.yaml: failed with reason: [ERROR - Query parameter 'state' is required on path '/address' but not found in request.: []]",
+                    "errors": []
+                }
+            }
+        
+
+--- FOR: 1600 Pennsylvania Ave NW, Washington, DC 20500 ---
+Status: 400
+
+            {
+                "apiVersion": "/addresses/v3/",
+                "error": {
+                    "code": "400",
+                    "message": "OASValidation OpenAPI-Spec-Validation-Addresses-Request with resource oas://addresses_v3.yaml: failed with reason: [ERROR - Query parameter 'state' is required on path '/address' but not found in request.: []]",
+                    "errors": []
+                }
+            }
+        
