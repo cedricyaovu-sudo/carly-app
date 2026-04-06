@@ -434,7 +434,7 @@ const ServiceDetails = () => {
                         }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                    <span style={{ fontWeight: '500', fontSize: '16px', maxWidth: '130px' }}>{service.title}</span>
+                                    <span style={{ fontWeight: '500', fontSize: '16px', width: '180px' }}>{service.title}</span>
                                     {isComingSoon && (
                                         <span style={{ fontSize: '10px', fontWeight: '700', color: '#666' }}>COMING SOON</span>
                                     )}
