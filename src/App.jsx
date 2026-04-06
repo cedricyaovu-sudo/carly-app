@@ -98,21 +98,21 @@ function App() {
                 <BrowserRouter>
                   <ScrollToTop />
                 <Routes>
-                  {/* Unprotected Onboarding Routes */}
-                  <Route path="/onboarding" element={<Onboarding />} />
-                  <Route path="/paywall" element={<Paywall />} />
-                  <Route path="/paywall-checkout" element={<PaywallCheckout />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
-                  <Route path="/success" element={<PostCheckoutSuccess />} />
-                  <Route path="/review" element={<ReviewPrompt />} />
-                  
-                  {/* Public Routes - No Onboarding Guard */}
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/signup" element={<SignUp />} />
-  
-                  {/* Onboarding Guard wrapping the rest of the app */}
-                  <Route element={<OnboardingGuard />}>
-                    {/* Home is protected by ProGuard to require payment verification specifically for the landing page */}
+                    {/* Unprotected Onboarding Routes */}
+                    <Route path="/onboarding" element={<Onboarding />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/success" element={<PostCheckoutSuccess />} />
+                    <Route path="/review" element={<ReviewPrompt />} />
+                    
+                    {/* Public Routes - No Onboarding Guard */}
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<SignUp />} />
+    
+                    {/* Onboarding Guard wrapping the rest of the app */}
+                    <Route element={<OnboardingGuard />}>
+                      <Route path="/paywall" element={<Paywall />} />
+                      <Route path="/paywall-checkout" element={<PaywallCheckout />} />
+                      {/* Home is protected by ProGuard to require payment verification specifically for the landing page */}
                     <Route path="/" element={<ProGuard><Home /></ProGuard>} />
                     <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
                       <Route path="/new-service" element={<NewService />} />
