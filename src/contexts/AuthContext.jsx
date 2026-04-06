@@ -14,14 +14,14 @@ export const AuthProvider = ({ children }) => {
         try {
             const { data, error } = await supabase
                 .from('profiles')
-                .select('role, onboarding_completed, is_gofuel_pro')
+                .select('*')
                 .eq('id', userId)
                 .single();
             if (error) throw error;
             setProfile(data);
         } catch (err) {
             console.error('Error fetching auth profile:', err);
-            setProfile({ role: 'user', onboarding_completed: false, is_gofuel_pro: false });
+            setProfile(null);
         }
     }, []);
 

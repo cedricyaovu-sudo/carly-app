@@ -57,16 +57,12 @@ const OnboardingGuard = () => {
   
   if (loading) return null;
 
-  // Unauthenticated users must start at the onboarding splash page
   if (!user) {
     return <Navigate to="/onboarding" replace />;
   }
 
-  // If signed in but profile hasn't loaded yet, wait.
-  // profile is only null if signed out or still initializing.
   if (user && !profile) return null;
 
-  // Only guard for authenticated users who haven't completed onboarding
   if (user && profile && !profile.onboarding_completed) {
     return <Navigate to="/onboarding" replace />;
   }
@@ -98,21 +94,18 @@ function App() {
                 <BrowserRouter>
                   <ScrollToTop />
                 <Routes>
-                    {/* Unprotected Onboarding Routes */}
-                    <Route path="/onboarding" element={<Onboarding />} />
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
-                    <Route path="/success" element={<PostCheckoutSuccess />} />
-                    <Route path="/review" element={<ReviewPrompt />} />
-                    
-                    {/* Public Routes - No Onboarding Guard */}
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/signup" element={<SignUp />} />
-    
-                    {/* Onboarding Guard wrapping the rest of the app */}
-                    <Route element={<OnboardingGuard />}>
-                      <Route path="/paywall" element={<Paywall />} />
-                      <Route path="/paywall-checkout" element={<PaywallCheckout />} />
-                      {/* Home is protected by ProGuard to require payment verification specifically for the landing page */}
+                  {/* Fully public routes - no auth required */}
+                  <Route path="/onboarding" element={<Onboarding />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/success" element={<PostCheckoutSuccess />} />
+                  <Route path="/review" element={<ReviewPrompt />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/signup" element={<SignUp />} />
+
+                  {/* OnboardingGuard: requires auth + onboarding_completed */}
+                  <Route element={<OnboardingGuard />}>
+                    <Route path="/paywall" element={<Paywall />} />
+                    <Route path="/paywall-checkout" element={<PaywallCheckout />} />
                     <Route path="/" element={<ProGuard><Home /></ProGuard>} />
                     <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
                       <Route path="/new-service" element={<NewService />} />
@@ -148,7 +141,8 @@ function App() {
                       <Route path="/games/trivia" element={<CarTrivia />} />
                     </Route>
                   </Route>
-                  <Route path="*" element={<Navigate to="/" replace />} />
+
+                  <Route path="*" element={<Navigate to="/onboarding" replace />} />
                 </Routes>
               </BrowserRouter>
             </GameProvider>
