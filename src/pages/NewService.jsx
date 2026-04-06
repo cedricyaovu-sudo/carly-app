@@ -594,6 +594,7 @@ const NewService = () => {
                                         pointerEvents: isVisible ? 'auto' : 'none',
                                         position: 'relative',
                                         padding: 'var(--spacing-md)',
+                                        paddingTop: isFullWidth ? '40px' : 'var(--spacing-md)',
                                         justifyContent: 'flex-start'
                                     }}
                                 >
