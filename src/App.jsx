@@ -63,6 +63,8 @@ const OnboardingGuard = () => {
 
   if (user && !profile) return null;
 
+  if (profile?.role === 'admin') return <Outlet />;
+
   if (user && profile && !profile.onboarding_completed) {
     return <Navigate to="/onboarding" replace />;
   }
@@ -76,9 +78,8 @@ const ProGuard = ({ children }) => {
   if (!user) return <Navigate to="/login" replace />;
   if (user && !profile) return null;
 
-  if (profile && !profile.is_gofuel_pro) {
-    return <Navigate to="/paywall" replace />;
-  }
+  if (profile?.role === 'admin') return children;
+
   return children;
 };
 
