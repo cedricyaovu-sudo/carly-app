@@ -7,12 +7,11 @@ const SelectDateTime = () => {
     const navigate = useNavigate();
     const { updateBooking } = useBooking();
 
+    const minBookableDate = new Date(2026, 3, 15);
+    minBookableDate.setHours(0, 0, 0, 0);
+
     // State for Calendar
-    const [currentMonth, setCurrentMonth] = useState(() => {
-        const d = new Date();
-        const minAllowedDate = new Date(2026, 3, 15);
-        return d < minAllowedDate ? minAllowedDate : d;
-    });
+    const [currentMonth, setCurrentMonth] = useState(() => new Date());
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedTime, setSelectedTime] = useState(null);
     const [timeSlots, setTimeSlots] = useState([]);
@@ -52,12 +51,9 @@ const SelectDateTime = () => {
     const handlePrevMonth = () => {
         const newDate = new Date(currentMonth);
         newDate.setMonth(newDate.getMonth() - 1);
-        // Prevent going back before current month if it's the current month
-        const today = new Date();
-        const minAllowedDate = new Date(2026, 3, 15); // April 15, 2026
-        if (today < minAllowedDate) today.setTime(minAllowedDate.getTime());
-        if (newDate.getMonth() < today.getMonth() && newDate.getFullYear() === today.getFullYear()) return;
-        if (newDate.getFullYear() < today.getFullYear()) return;
+        const now = new Date();
+        if (newDate.getMonth() < now.getMonth() && newDate.getFullYear() === now.getFullYear()) return;
+        if (newDate.getFullYear() < now.getFullYear()) return;
         setCurrentMonth(newDate);
     };
 
@@ -106,8 +102,6 @@ const SelectDateTime = () => {
     ];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const minAllowedDate = new Date(2026, 3, 15); // April 15, 2026
-    if (today < minAllowedDate) today.setTime(minAllowedDate.getTime());
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -159,15 +153,15 @@ const SelectDateTime = () => {
                         const day = i + 1;
                         const date = new Date(year, month, day);
                         const isToday = date.getTime() === today.getTime();
-                        const isPast = date < today;
+                        const isDisabled = date < today || date < minBookableDate;
                         const isSelected = selectedDate && date.getTime() === selectedDate.getTime();
 
                         return (
                             <div key={day} style={{ display: 'flex', justifyContent: 'center' }}>
                                 <button
                                     type="button"
-                                    onClick={() => !isPast && handleDateClick(day)}
-                                    disabled={isPast}
+                                    onClick={() => !isDisabled && handleDateClick(day)}
+                                    disabled={isDisabled}
                                     style={{
                                         width: '40px',
                                         height: '40px',
@@ -175,9 +169,9 @@ const SelectDateTime = () => {
                                         minHeight: '40px',
                                         borderRadius: '50%',
                                         background: isSelected ? 'var(--color-primary)' : 'transparent',
-                                        color: isSelected ? 'white' : (isPast ? '#ccc' : 'black'),
+                                        color: isSelected ? 'white' : (isDisabled ? '#ccc' : 'black'),
                                         fontWeight: isSelected || isToday ? '600' : '400',
-                                        cursor: isPast ? 'not-allowed' : 'pointer',
+                                        cursor: isDisabled ? 'not-allowed' : 'pointer',
                                         border: isToday && !isSelected ? '1px solid var(--color-primary)' : 'none',
                                         display: 'flex',
                                         alignItems: 'center',
