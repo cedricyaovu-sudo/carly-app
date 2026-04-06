@@ -94,8 +94,10 @@ function App() {
                 <BrowserRouter>
                   <ScrollToTop />
                 <Routes>
-                  {/* Fully public routes - no auth required */}
+                  {/* Public routes - no auth required */}
                   <Route path="/onboarding" element={<Onboarding />} />
+                  <Route path="/paywall" element={<Paywall />} />
+                  <Route path="/paywall-checkout" element={<PaywallCheckout />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/success" element={<PostCheckoutSuccess />} />
                   <Route path="/review" element={<ReviewPrompt />} />
@@ -104,8 +106,6 @@ function App() {
 
                   {/* OnboardingGuard: requires auth + onboarding_completed */}
                   <Route element={<OnboardingGuard />}>
-                    <Route path="/paywall" element={<Paywall />} />
-                    <Route path="/paywall-checkout" element={<PaywallCheckout />} />
                     <Route path="/" element={<ProGuard><Home /></ProGuard>} />
                     <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
                       <Route path="/new-service" element={<NewService />} />
