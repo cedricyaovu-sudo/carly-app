@@ -148,6 +148,7 @@ function App() {
                       <Route path="/games/trivia" element={<CarTrivia />} />
                     </Route>
                   </Route>
+                  <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </BrowserRouter>
             </GameProvider>
