@@ -315,7 +315,7 @@ const EVRecharging = () => {
                             <div style={{ flex: 1 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <div style={{ fontWeight: '600', fontSize: '16px', marginBottom: '4px', width: '180px' }}>{service.title}</div>
+                                        <div style={{ fontWeight: '600', fontSize: '16px', marginBottom: '4px', maxWidth: '130px' }}>{service.title}</div>
                                         {isComingSoon && (
                                             <span style={{ fontSize: '10px', fontWeight: '700', color: theme.textSecondary }}>COMING SOON</span>
                                         )}

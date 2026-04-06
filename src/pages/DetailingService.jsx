@@ -340,7 +340,7 @@ const DetailingService = () => {
                 </div>
                 <div style={{ flex: 1, paddingTop: '2px' }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', flexWrap: 'wrap' }}>
-                        <div style={{ fontWeight: '600', fontSize: '16px', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px', maxWidth: '180px' }}>
+                        <div style={{ fontWeight: '600', fontSize: '16px', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px', maxWidth: '150px' }}>
                             Add Ceramic Coating? <Info size={14} color="#999" />
                         </div>
                         {ceramicCoating > 0 && (
@@ -424,7 +424,7 @@ const DetailingService = () => {
                             <div style={{ flex: 1 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <div style={{ fontWeight: '600', fontSize: '16px', marginBottom: '4px', width: '180px' }}>{service.title}</div>
+                                        <div style={{ fontWeight: '600', fontSize: '16px', marginBottom: '4px', maxWidth: '130px' }}>{service.title}</div>
                                         {isComingSoon && (
                                             <span style={{ fontSize: '10px', fontWeight: '700', color: '#666' }}>COMING SOON</span>
                                         )}
