@@ -12,7 +12,6 @@ import ErrorBoundary from './components/ui/ErrorBoundary';
 import { ToastContainer } from './components/ui/Toast';
 import { LoadingOverlay } from './components/ui/LoadingSpinner';
 import ScrollToTop from './components/ui/ScrollToTop';
-import Home from './pages/Home';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import NewService from './pages/NewService';
@@ -71,18 +70,6 @@ const OnboardingGuard = () => {
   return <Outlet />;
 };
 
-const ProGuard = ({ children }) => {
-  const { user, profile, loading } = useAuth();
-  
-  if (loading) return null;
-  if (!user) return <Navigate to="/login" replace />;
-  if (user && !profile) return null;
-
-  if (profile?.role === 'admin') return children;
-
-  return children;
-};
-
 function App() {
   return (
     <ErrorBoundary>
@@ -96,6 +83,7 @@ function App() {
                   <ScrollToTop />
                 <Routes>
                   {/* Public routes - no auth required */}
+                  <Route path="/" element={<Onboarding />} />
                   <Route path="/onboarding" element={<Onboarding />} />
                   <Route path="/paywall" element={<Paywall />} />
                   <Route path="/paywall-checkout" element={<PaywallCheckout />} />
@@ -107,7 +95,6 @@ function App() {
 
                   {/* OnboardingGuard: requires auth + onboarding_completed */}
                   <Route element={<OnboardingGuard />}>
-                    <Route path="/" element={<ProGuard><Home /></ProGuard>} />
                     <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
                       <Route path="/new-service" element={<NewService />} />
                       <Route path="/details" element={<ServiceDetails />} />

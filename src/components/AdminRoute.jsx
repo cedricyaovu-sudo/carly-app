@@ -9,7 +9,7 @@ const AdminRoute = ({ children }) => {
     }
 
     if (profile?.role !== 'admin') {
-        return <Navigate to="/" replace />;
+        return <Navigate to="/new-service" replace />;
     }
 
     return children ? children : <Outlet />;
