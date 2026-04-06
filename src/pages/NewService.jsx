@@ -372,7 +372,7 @@ const NewService = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
             {firstName && (
-                <div style={{ fontSize: '14px', color: '#666', marginTop: '-6px', marginBottom: '18px', fontWeight: '500' }}>
+                <div style={{ fontSize: '14px', color: isDarkMode ? '#94A3B8' : '#666', marginTop: '-6px', marginBottom: '18px', fontWeight: '500' }}>
                     Welcome back, {firstName}!
                 </div>
             )}

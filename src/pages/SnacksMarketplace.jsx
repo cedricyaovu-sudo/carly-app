@@ -159,7 +159,7 @@ const SnacksMarketplace = () => {
   return (
     <div className="page-container" style={{ paddingBottom: '100px' }}>
       <div className="page-header" style={{ position: 'sticky', top: 0, zIndex: 50, background: isDarkMode ? 'var(--color-bg-primary)' : '#fff', paddingBottom: '16px' }}>
-        <button className="back-button" onClick={() => navigate('/new-service')}>
+        <button style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', color: isDarkMode ? 'white' : 'var(--color-text)' }} onClick={() => navigate('/new-service')}>
           <ArrowLeft size={24} />
         </button>
         <h1>Gas Station Snacks</h1>

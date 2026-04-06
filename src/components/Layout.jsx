@@ -164,7 +164,7 @@ const Layout = () => {
                     <div
                         onClick={() => navigate('/new-service')}
                         className="bottom-nav-item"
-                        style={{ color: location.pathname === '/new-service' ? '#007AFF' : '#475569' }}
+                        style={{ color: location.pathname === '/new-service' ? '#007AFF' : (isDarkMode ? '#94A3B8' : '#475569') }}
                     >
                         <Home size={24} strokeWidth={location.pathname === '/new-service' ? 2.5 : 2} />
                         <span>Home</span>
@@ -173,7 +173,7 @@ const Layout = () => {
                 <div
                     onClick={() => navigate('/chat')}
                     className="bottom-nav-item"
-                    style={{ color: location.pathname === '/chat' ? '#007AFF' : '#475569' }}
+                    style={{ color: location.pathname === '/chat' ? '#007AFF' : (isDarkMode ? '#94A3B8' : '#475569') }}
                 >
                     <MessageSquare size={24} strokeWidth={location.pathname === '/chat' ? 2.5 : 2} />
                     <span>Chat</span>
@@ -182,7 +182,7 @@ const Layout = () => {
                 <div
                     onClick={() => navigate('/meets')}
                     className="bottom-nav-item"
-                    style={{ color: location.pathname === '/meets' ? '#007AFF' : '#475569' }}
+                    style={{ color: location.pathname === '/meets' ? '#007AFF' : (isDarkMode ? '#94A3B8' : '#475569') }}
                 >
                     <MapPin size={24} strokeWidth={location.pathname === '/meets' ? 2.5 : 2} />
                     <span>Meets</span>
@@ -191,7 +191,7 @@ const Layout = () => {
                 <div
                     onClick={() => navigate('/games')}
                     className="bottom-nav-item"
-                    style={{ color: location.pathname === '/games' ? '#007AFF' : '#475569' }}
+                    style={{ color: location.pathname === '/games' ? '#007AFF' : (isDarkMode ? '#94A3B8' : '#475569') }}
                 >
                     <Gamepad2 size={24} strokeWidth={location.pathname === '/games' ? 2.5 : 2} />
                     <span>Games</span>
