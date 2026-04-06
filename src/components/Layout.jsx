@@ -84,7 +84,7 @@ const Layout = () => {
                         onClick={() => navigate(-1)}
                         style={{ background: 'none', padding: 0, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
                     >
-                        <ArrowLeft size={24} color="var(--color-text)" />
+                        <ArrowLeft size={24} color={isDarkMode ? "#F8FAFC" : "var(--color-text)"} />
                     </button>
                 </div>
                 <h1 style={{ fontSize: 'var(--font-size-lg)', margin: 0, textAlign: 'center', flex: 1 }}>{title}</h1>

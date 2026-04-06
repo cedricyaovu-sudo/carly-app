@@ -120,7 +120,7 @@ export default function AddressAutocomplete({
                                     padding: '12px 16px',
                                     borderBottom: idx < suggestions.length - 1 ? '1px solid var(--color-border, #f1f5f9)' : 'none',
                                     fontSize: '14px',
-                                    color: 'var(--color-text-primary, #1e293b)',
+                                    color: 'var(--color-text)',
                                     cursor: 'pointer',
                                     lineHeight: '1.4'
                                 }}

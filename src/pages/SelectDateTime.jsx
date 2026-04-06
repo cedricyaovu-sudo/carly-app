@@ -30,9 +30,9 @@ const SelectDateTime = () => {
 
         while (start < end) {
             const startTime = formatTime(start);
-            const endTime = formatTime(start + 45);
+            const endTime = formatTime(start + 90);
             slots.push(`${startTime} - ${endTime}`);
-            start += 45;
+            start += 90;
         }
         setTimeSlots(slots);
     }, []);

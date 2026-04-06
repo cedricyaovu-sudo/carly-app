@@ -626,7 +626,7 @@ const NewService = () => {
                                     </h3>
                                     <p style={{
                                         fontSize: '12px',
-                                        color: isVisible ? '#334155' : '#475569',
+                                        color: isVisible ? (isDarkMode ? '#94A3B8' : '#334155') : (isDarkMode ? '#64748b' : '#475569'),
                                         opacity: isVisible ? 1 : 0.9,
                                         marginBottom: !isVisible ? 'var(--spacing-sm)' : '0'
                                     }}>
