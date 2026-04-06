@@ -334,13 +334,13 @@ const DetailingService = () => {
 
             {/* Premium Options */}
             <h3 style={{ fontSize: '18px', fontWeight: '700', marginBottom: 'var(--spacing-md)' }}>Premium Options</h3>
-            <div style={{ background: 'var(--color-surface)', borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-md)', display: 'flex', alignItems: 'center', marginBottom: 'var(--spacing-xl)', boxShadow: 'var(--shadow-sm)' }}>
+            <div style={{ background: 'var(--color-surface)', borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-md)', display: 'flex', alignItems: 'flex-start', marginBottom: 'var(--spacing-xl)', boxShadow: 'var(--shadow-sm)' }}>
                 <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: theme.iconBoxBg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 'var(--spacing-md)', flexShrink: 0 }}>
                     <Sparkles size={24} color={theme.iconColor} />
                 </div>
-                <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{ fontWeight: '600', fontSize: '16px', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px', width: '180px' }}>
+                <div style={{ flex: 1, paddingTop: '2px' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', flexWrap: 'wrap' }}>
+                        <div style={{ fontWeight: '600', fontSize: '16px', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px', maxWidth: '180px' }}>
                             Add Ceramic Coating? <Info size={14} color="#999" />
                         </div>
                         {ceramicCoating > 0 && (
@@ -375,7 +375,8 @@ const DetailingService = () => {
                         borderRadius: '15px',
                         position: 'relative',
                         cursor: 'pointer',
-                        transition: 'none'
+                        transition: 'none',
+                        marginTop: '8px'
                     }}
                 >
                     <div style={{

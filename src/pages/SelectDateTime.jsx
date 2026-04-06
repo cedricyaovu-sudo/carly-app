@@ -8,7 +8,11 @@ const SelectDateTime = () => {
     const { updateBooking } = useBooking();
 
     // State for Calendar
-    const [currentMonth, setCurrentMonth] = useState(new Date());
+    const [currentMonth, setCurrentMonth] = useState(() => {
+        const d = new Date();
+        const minAllowedDate = new Date(2026, 3, 15);
+        return d < minAllowedDate ? minAllowedDate : d;
+    });
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedTime, setSelectedTime] = useState(null);
     const [timeSlots, setTimeSlots] = useState([]);
@@ -50,6 +54,8 @@ const SelectDateTime = () => {
         newDate.setMonth(newDate.getMonth() - 1);
         // Prevent going back before current month if it's the current month
         const today = new Date();
+        const minAllowedDate = new Date(2026, 3, 15); // April 15, 2026
+        if (today < minAllowedDate) today.setTime(minAllowedDate.getTime());
         if (newDate.getMonth() < today.getMonth() && newDate.getFullYear() === today.getFullYear()) return;
         if (newDate.getFullYear() < today.getFullYear()) return;
         setCurrentMonth(newDate);
@@ -100,6 +106,8 @@ const SelectDateTime = () => {
     ];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const minAllowedDate = new Date(2026, 3, 15); // April 15, 2026
+    if (today < minAllowedDate) today.setTime(minAllowedDate.getTime());
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column' }}>

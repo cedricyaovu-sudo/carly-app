@@ -239,7 +239,7 @@ const MaintenanceService = () => {
                             borderRadius: 'var(--radius-lg)',
                             padding: 'var(--spacing-md)',
                             display: 'flex',
-                            alignItems: 'center',
+                            alignItems: 'flex-start',
                             boxShadow: 'var(--shadow-sm)',
                             opacity: isComingSoon ? 0.6 : 1,
                             filter: isComingSoon ? 'grayscale(100%)' : 'none'
@@ -247,10 +247,10 @@ const MaintenanceService = () => {
                             <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: service.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 'var(--spacing-md)', flexShrink: 0 }}>
                                 {service.icon}
                             </div>
-                            <div style={{ flex: 1 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ flex: 1, paddingTop: '2px' }}>
+                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', flexWrap: 'wrap' }}>
                                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <div style={{ fontWeight: '600', fontSize: '16px', marginBottom: '4px', color: theme.text, width: '180px' }}>{service.title}</div>
+                                        <div style={{ fontWeight: '600', fontSize: '16px', marginBottom: '4px', color: theme.text, maxWidth: '180px' }}>{service.title}</div>
                                         {isComingSoon && (
                                             <span style={{ fontSize: '10px', fontWeight: '700', color: theme.textSecondary }}>COMING SOON</span>
                                         )}
@@ -293,7 +293,8 @@ const MaintenanceService = () => {
                                     position: 'relative',
                                     cursor: (isComingSoon || isVisited) ? 'not-allowed' : 'pointer',
                                     transition: 'none',
-                                    opacity: isVisited ? 0.7 : 1
+                                    opacity: isVisited ? 0.7 : 1,
+                                    marginTop: '8px'
                                 }}
                             >
                                 <div style={{
