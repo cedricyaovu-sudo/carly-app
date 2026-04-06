@@ -594,15 +594,14 @@ const NewService = () => {
                                         pointerEvents: isVisible ? 'auto' : 'none',
                                         position: 'relative',
                                         padding: 'var(--spacing-md)',
-                                        justifyContent: 'flex-start',
-                                        ...(isPaintCorrection && { transform: 'translateX(-65px)' })
+                                        justifyContent: 'flex-start'
                                     }}
                                 >
                                     {service.id === 'Ceramic Coating' && (
                                         <div style={{
                                             position: 'absolute',
                                             top: '12px',
-                                            right: '12px',
+                                            right: '77px',
                                             background: 'rgba(0, 199, 190, 0.15)',
                                             color: '#00C7BE',
                                             padding: '4px 10px',
