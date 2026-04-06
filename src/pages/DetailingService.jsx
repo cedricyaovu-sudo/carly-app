@@ -340,7 +340,7 @@ const DetailingService = () => {
                 </div>
                 <div style={{ flex: 1, paddingTop: '2px' }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', flexWrap: 'wrap' }}>
-                        <div style={{ fontWeight: '600', fontSize: '16px', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px', maxWidth: '100px' }}>
+                        <div style={{ fontWeight: '600', fontSize: '16px', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px', maxWidth: '180px' }}>
                             Add Ceramic Coating? <Info size={14} color="#999" />
                         </div>
                         {ceramicCoating > 0 && (

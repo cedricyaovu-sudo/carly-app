@@ -576,7 +576,7 @@ const NewService = () => {
                             const isMaintenance = service.id === 'Maintenance';
                             const isPaintCorrection = service.id === 'Paint Correction';
 
-                            return (
+                                    return (
                                 <div
                                     key={service.id}
                                     onClick={() => isVisible && handleServiceClick(service.id)}
@@ -588,13 +588,14 @@ const NewService = () => {
                                         flexDirection: 'column',
                                         alignItems: isFullWidth ? 'center' : 'stretch',
                                         textAlign: isFullWidth ? 'center' : 'left',
-                                        height: '150px', // Standardized height for perfect pairing
+                                        height: '150px',
                                         gridColumn: isFullWidth ? 'span 2' : 'auto',
-                                        opacity: isVisible ? 1 : 0.8, // Brighter overall
+                                        opacity: isVisible ? 1 : 0.8,
                                         pointerEvents: isVisible ? 'auto' : 'none',
                                         position: 'relative',
                                         padding: 'var(--spacing-md)',
-                                        justifyContent: 'flex-start'
+                                        justifyContent: 'flex-start',
+                                        ...(isPaintCorrection && { transform: 'translateX(-65px)' })
                                     }}
                                 >
                                     {service.id === 'Ceramic Coating' && (
