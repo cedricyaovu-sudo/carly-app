@@ -601,16 +601,20 @@ const NewService = () => {
                                         <div style={{
                                             position: 'absolute',
                                             top: '12px',
-                                            right: '77px',
+                                            right: '47px',
                                             background: 'rgba(0, 199, 190, 0.15)',
                                             color: '#00C7BE',
                                             padding: '4px 10px',
                                             borderRadius: 'var(--radius-full)',
                                             fontSize: '10px',
                                             fontWeight: '800',
-                                            letterSpacing: '0.05em'
+                                            letterSpacing: '0.05em',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px'
                                         }}>
                                             INCLUDES PAINT CORRECTION
+                                            <Sparkles size={12} color="#00C7BE" />
                                         </div>
                                     )}
                                     <div style={{ marginBottom: 'var(--spacing-md)' }}>
