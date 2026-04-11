@@ -18,6 +18,9 @@ const Onboarding = () => {
 
   // Form selections (we don't strictly need to save them, but it builds the personalized feel)
   const [selections, setSelections] = useState({
+    name: '',
+    email: '',
+    phone: '',
     worstChore: '',
     feltUnsafe: null,
     lowOnGas: null,
@@ -35,7 +38,7 @@ const Onboarding = () => {
   };
 
   useEffect(() => {
-    if (step === 8) {
+    if (step === 9) {
       // Simulate the "calculating" Aha moment
       const timer = setTimeout(() => {
         setLoadingComplete(true);
@@ -232,9 +235,70 @@ const Onboarding = () => {
             </motion.div>
           )}
 
-          {/* STEP 2: Needs Assessment */}
+          {/* STEP 2: Contact Info */}
           {step === 2 && (
             <motion.div key="step2" variants={containerVariants} initial="hidden" animate="visible" exit="exit" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1 }}>
+              <h2 style={{ fontSize: '28px', fontWeight: '800', color: colors.text, marginBottom: '32px', lineHeight: '1.3' }}>
+                Let's get to know you.
+              </h2>
+              <input 
+                type="text" 
+                placeholder="Full Name" 
+                value={selections.name}
+                onChange={e => setSelections(prev => ({...prev, name: e.target.value}))}
+                style={{ width: '100%', padding: '16px', borderRadius: '12px', border: `1px solid ${colors.border}`, background: 'transparent', color: colors.text, marginBottom: '16px', fontSize: '16px' }}
+              />
+              <input 
+                type="email" 
+                placeholder="Email Address" 
+                value={selections.email}
+                onChange={e => setSelections(prev => ({...prev, email: e.target.value}))}
+                style={{ width: '100%', padding: '16px', borderRadius: '12px', border: `1px solid ${colors.border}`, background: 'transparent', color: colors.text, marginBottom: '16px', fontSize: '16px' }}
+              />
+              <input 
+                type="tel" 
+                placeholder="Phone Number" 
+                value={selections.phone}
+                onChange={e => setSelections(prev => ({...prev, phone: e.target.value}))}
+                style={{ width: '100%', padding: '16px', borderRadius: '12px', border: `1px solid ${colors.border}`, background: 'transparent', color: colors.text, marginBottom: '32px', fontSize: '16px' }}
+              />
+              
+              <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={async () => {
+                      if (selections.name && selections.email && selections.phone) {
+                          try {
+                              // Save lead immediately
+                              await supabase.from('leads').insert({
+                                  name: selections.name,
+                                  email: selections.email,
+                                  phone: selections.phone
+                              });
+                          } catch (e) {
+                              console.error("Failed to save lead info", e);
+                          }
+                          nextStep();
+                      }
+                  }}
+                  disabled={!selections.name || !selections.email || !selections.phone}
+                  style={{
+                    width: '100%', padding: '20px', borderRadius: '16px', background: colors.primary,
+                    color: 'white', border: 'none', fontSize: '18px', fontWeight: '700', cursor: (!selections.name || !selections.email || !selections.phone) ? 'not-allowed' : 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                    boxShadow: (!selections.name || !selections.email || !selections.phone) ? 'none' : `0 8px 24px ${colors.primary}50`,
+                    opacity: (!selections.name || !selections.email || !selections.phone) ? 0.5 : 1,
+                    marginTop: 'auto'
+                  }}
+                >
+                  Continue <ArrowRight size={20} />
+              </motion.button>
+            </motion.div>
+          )}
+
+          {/* STEP 3: Needs Assessment */}
+          {step === 3 && (
+            <motion.div key="step3" variants={containerVariants} initial="hidden" animate="visible" exit="exit" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1 }}>
               <h2 style={{ fontSize: '28px', fontWeight: '800', color: colors.text, marginBottom: '32px', lineHeight: '1.3' }}>
                 What car chores do you hate the most?
               </h2>
@@ -245,9 +309,9 @@ const Onboarding = () => {
             </motion.div>
           )}
 
-          {/* STEP 3: Pain Point 1 */}
-          {step === 3 && (
-            <motion.div key="step3" variants={containerVariants} initial="hidden" animate="visible" exit="exit" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1 }}>
+          {/* STEP 4: Pain Point 1 */}
+          {step === 4 && (
+            <motion.div key="step4" variants={containerVariants} initial="hidden" animate="visible" exit="exit" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1 }}>
               <div style={{ marginBottom: '40px', display: 'flex', justifyContent: 'center' }}>
                 <div style={{ width: '80px', height: '80px', borderRadius: '40px', background: `${colors.primary}20`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <ShieldCheck size={40} color={colors.primary} />
@@ -260,9 +324,9 @@ const Onboarding = () => {
             </motion.div>
           )}
 
-          {/* STEP 4: Pain Point 2 */}
-          {step === 4 && (
-            <motion.div key="step4" variants={containerVariants} initial="hidden" animate="visible" exit="exit" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1 }}>
+          {/* STEP 5: Pain Point 2 */}
+          {step === 5 && (
+            <motion.div key="step5" variants={containerVariants} initial="hidden" animate="visible" exit="exit" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1 }}>
               <div style={{ marginBottom: '40px', display: 'flex', justifyContent: 'center' }}>
                 <div style={{ width: '80px', height: '80px', borderRadius: '40px', background: `${colors.primary}20`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Fuel size={40} color={colors.primary} />
@@ -275,9 +339,9 @@ const Onboarding = () => {
             </motion.div>
           )}
 
-          {/* STEP 5: Pain Point 3 */}
-          {step === 5 && (
-            <motion.div key="step5" variants={containerVariants} initial="hidden" animate="visible" exit="exit" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1 }}>
+          {/* STEP 6: Pain Point 3 */}
+          {step === 6 && (
+            <motion.div key="step6" variants={containerVariants} initial="hidden" animate="visible" exit="exit" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1 }}>
               <h2 style={{ fontSize: '28px', fontWeight: '800', color: colors.text, marginBottom: '40px', lineHeight: '1.4', textAlign: 'center' }}>
                 Did you ever wish your maintenance and gas could be taken care of, without you having to be involved or leaving the comfort of your home?
               </h2>
@@ -285,9 +349,9 @@ const Onboarding = () => {
             </motion.div>
           )}
 
-          {/* STEP 6: Pain Point 4 */}
-          {step === 6 && (
-            <motion.div key="step6" variants={containerVariants} initial="hidden" animate="visible" exit="exit" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1 }}>
+          {/* STEP 7: Pain Point 4 */}
+          {step === 7 && (
+            <motion.div key="step7" variants={containerVariants} initial="hidden" animate="visible" exit="exit" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1 }}>
               <h2 style={{ fontSize: '28px', fontWeight: '800', color: colors.text, marginBottom: '40px', lineHeight: '1.4', textAlign: 'center' }}>
                 Did you ever wish your car(s) could be clean, without you having to be involved or leaving the comfort of your home?
               </h2>
@@ -295,9 +359,9 @@ const Onboarding = () => {
             </motion.div>
           )}
 
-          {/* STEP 7: Value Quantification */}
-          {step === 7 && (
-            <motion.div key="step7" variants={containerVariants} initial="hidden" animate="visible" exit="exit" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1 }}>
+          {/* STEP 8: Value Quantification */}
+          {step === 8 && (
+            <motion.div key="step8" variants={containerVariants} initial="hidden" animate="visible" exit="exit" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1 }}>
               <h2 style={{ fontSize: '28px', fontWeight: '800', color: colors.text, marginBottom: '32px', lineHeight: '1.3' }}>
                 How many vehicles are in your household?
               </h2>
@@ -307,9 +371,9 @@ const Onboarding = () => {
             </motion.div>
           )}
 
-          {/* STEP 8: Aha Moment Loading */}
-          {step === 8 && (
-            <motion.div key="step8" variants={containerVariants} initial="hidden" animate="visible" exit="exit" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, textAlign: 'center' }}>
+          {/* STEP 9: Aha Moment Loading */}
+          {step === 9 && (
+            <motion.div key="step9" variants={containerVariants} initial="hidden" animate="visible" exit="exit" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, textAlign: 'center' }}>
 
               {!loadingComplete ? (
                 <>

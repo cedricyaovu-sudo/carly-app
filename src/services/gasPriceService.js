@@ -32,17 +32,21 @@ export const getGasPrices = async () => {
             }
         }
 
-        if (!EIA_API_KEY) {
-            console.warn('EIA API key missing, using default prices');
-            return DEFAULT_PRICES;
-        }
-
-        const url = `${BASE_URL}?api_key=${EIA_API_KEY}&frequency=weekly&data[0]=value&sort[0][column]=period&sort[0][direction]=desc&offset=0&length=100`;
-
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Failed to fetch from EIA');
+        // Use Edge Function instead of mapping env var directly
+        const SUPABASE_FUNCTIONS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
+        
+        const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/gas-prices`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+            }
+        });
+        
+        if (!response.ok) throw new Error('Failed to fetch from gas-prices edge function');
 
         const json = await response.json();
+        // Edge function returns the original json format
         const data = json.response.data;
 
         const prices = { ...DEFAULT_PRICES };

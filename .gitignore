@@ -24,3 +24,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Debug and temporary files
+*.txt
+*.sql
+tmp/
+check_pricing.js
+pricing.json
+pricing_edge_function.ts
+usps_edge_function.ts
+pr_dump.json
+pr_dump_utf8.json
+*.cjs

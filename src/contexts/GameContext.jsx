@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
+import { supabase } from '../lib/supabase';
 
 const GameContext = createContext();
 
@@ -11,31 +12,59 @@ export const GameProvider = ({ children }) => {
     const { user } = useAuth();
     const [goFuelCash, setGoFuelCash] = useState(0);
 
-    // Load initial balance
-    useEffect(() => {
-        if (user) {
-            const storedCash = localStorage.getItem(`carly_gofuel_cash_${user.id}`);
-            if (storedCash) {
-                setGoFuelCash(parseFloat(storedCash));
-            } else {
+    // Fetch initial balance from database
+    const fetchBalance = useCallback(async () => {
+        if (!user) {
+            setGoFuelCash(0);
+            return;
+        }
+
+        try {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('virtual_cash')
+                .eq('id', user.id)
+                .single();
+
+            if (error) {
+                console.error('Error fetching virtual cash:', error);
                 setGoFuelCash(0);
+            } else if (data) {
+                setGoFuelCash(Number(data.virtual_cash) || 0);
             }
-        } else {
+        } catch (err) {
+            console.error('Failed to parse virtual cash', err);
             setGoFuelCash(0);
         }
     }, [user]);
 
+    useEffect(() => {
+        fetchBalance();
+    }, [fetchBalance]);
+
     // Function to add cash (positive or negative)
-    const addCash = (amount, reason = 'game_reward') => {
+    const addCash = async (amount, reason = 'game_reward') => {
         if (!user) return;
         
-        setGoFuelCash(prev => {
-            const newBalance = prev + amount;
-            // Optionally: log transaction history to localStorage or DB here
-            // using the `reason` param for auditing
-            localStorage.setItem(`carly_gofuel_cash_${user.id}`, newBalance.toString());
-            return newBalance;
-        });
+        // Optimistic UI update
+        const newBalance = goFuelCash + amount;
+        setGoFuelCash(newBalance);
+
+        // Persist to database
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ virtual_cash: newBalance })
+                .eq('id', user.id);
+
+            if (error) {
+                console.error('Failed to update virtual cash in db:', error);
+                // Optionally revert state here if needed
+                // setGoFuelCash(goFuelCash);
+            }
+        } catch (err) {
+            console.error('Error executing query for virtual cash', err);
+        }
     };
 
     const val = {

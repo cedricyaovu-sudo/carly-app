@@ -17,7 +17,8 @@ export const PaymentProvider = ({ children }) => {
         setMembershipIntent(prev => ({ ...prev, isLoading: true, error: null }));
 
         try {
-            const response = await fetch('https://ugqjyfgcosjajazsdydw.supabase.co/functions/v1/create-payment-intent', {
+            const SUPABASE_FUNCTIONS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
+            const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/create-payment-intent`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

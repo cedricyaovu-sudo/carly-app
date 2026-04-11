@@ -54,13 +54,13 @@ import PostCheckoutSuccess from './pages/PostCheckoutSuccess';
 const OnboardingGuard = () => {
   const { user, profile, loading } = useAuth();
   
-  if (loading) return null;
+  if (loading) return <LoadingOverlay />;
 
   if (!user) {
     return <Navigate to="/onboarding" replace />;
   }
 
-  if (user && !profile) return null;
+  if (user && !profile) return <LoadingOverlay />;
 
   if (profile?.role === 'admin') return <Outlet />;
 
@@ -115,7 +115,6 @@ function App() {
                       <Route path="/appointment-view" element={<AppointmentView />} />
                       <Route path="/detailing-appointment-view" element={<DetailingAppointmentView />} />
                       <Route path="/maintenance" element={<MaintenanceService />} />
-                      <Route path="/mechanic" element={<MaintenanceService />} />
                       <Route path="/paint-correction" element={<PaintCorrection />} />
                       <Route path="/ceramic-coating" element={<CeramicCoating />} />
                       <Route path="/chat" element={<Chat />} />

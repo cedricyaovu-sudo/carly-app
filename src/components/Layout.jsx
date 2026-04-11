@@ -8,28 +8,8 @@ import { supabase } from '../lib/supabase';
 const Layout = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, profile } = useAuth();
     const { isDarkMode } = useTheme();
-    const [profile, setProfile] = useState(null);
-
-    useEffect(() => {
-        if (user) {
-            getProfile();
-        }
-    }, [user]);
-
-    const getProfile = async () => {
-        try {
-            const { data } = await supabase
-                .from('profiles')
-                .select('avatar_url')
-                .eq('id', user.id)
-                .single();
-            if (data) setProfile(data);
-        } catch (error) {
-            console.error('Error fetching profile:', error);
-        }
-    };
 
     // Simple title mapping based on path or state
     const getTitle = () => {
@@ -161,41 +141,41 @@ const Layout = () => {
                     background: isDarkMode ? 'rgba(28, 28, 30, 0.95)' : 'rgba(255, 255, 255, 0.95)',
                     border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'}`,
                 }}>
-                    <div
+                    <button
                         onClick={() => navigate('/new-service')}
                         className="bottom-nav-item"
-                        style={{ color: location.pathname === '/new-service' ? (isDarkMode ? 'var(--color-primary)' : '#007AFF') : (isDarkMode ? '#94A3B8' : '#475569') }}
+                        style={{ background: 'none', border: 'none', width: '100%', padding: '8px 0', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', color: location.pathname === '/new-service' ? (isDarkMode ? 'var(--color-primary)' : '#007AFF') : (isDarkMode ? '#94A3B8' : '#475569') }}
                     >
                         <Home size={24} strokeWidth={location.pathname === '/new-service' ? 2.5 : 2} />
                         <span>Home</span>
-                    </div>
+                    </button>
 
-                <div
+                <button
                     onClick={() => navigate('/chat')}
                     className="bottom-nav-item"
-                    style={{ color: location.pathname === '/chat' ? (isDarkMode ? 'var(--color-primary)' : '#007AFF') : (isDarkMode ? '#94A3B8' : '#475569') }}
+                    style={{ background: 'none', border: 'none', width: '100%', padding: '8px 0', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', color: location.pathname === '/chat' ? (isDarkMode ? 'var(--color-primary)' : '#007AFF') : (isDarkMode ? '#94A3B8' : '#475569') }}
                 >
                     <MessageSquare size={24} strokeWidth={location.pathname === '/chat' ? 2.5 : 2} />
                     <span>Chat</span>
-                </div>
+                </button>
 
-                <div
+                <button
                     onClick={() => navigate('/meets')}
                     className="bottom-nav-item"
-                    style={{ color: location.pathname === '/meets' ? (isDarkMode ? 'var(--color-primary)' : '#007AFF') : (isDarkMode ? '#94A3B8' : '#475569') }}
+                    style={{ background: 'none', border: 'none', width: '100%', padding: '8px 0', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', color: location.pathname === '/meets' ? (isDarkMode ? 'var(--color-primary)' : '#007AFF') : (isDarkMode ? '#94A3B8' : '#475569') }}
                 >
                     <MapPin size={24} strokeWidth={location.pathname === '/meets' ? 2.5 : 2} />
                     <span>Meets</span>
-                </div>
+                </button>
 
-                <div
+                <button
                     onClick={() => navigate('/games')}
                     className="bottom-nav-item"
-                    style={{ color: location.pathname === '/games' ? (isDarkMode ? 'var(--color-primary)' : '#007AFF') : (isDarkMode ? '#94A3B8' : '#475569') }}
+                    style={{ background: 'none', border: 'none', width: '100%', padding: '8px 0', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', color: location.pathname === '/games' ? (isDarkMode ? 'var(--color-primary)' : '#007AFF') : (isDarkMode ? '#94A3B8' : '#475569') }}
                 >
                     <Gamepad2 size={24} strokeWidth={location.pathname === '/games' ? 2.5 : 2} />
                     <span>Games</span>
-                </div>
+                </button>
             </nav>
             )}
         </div>

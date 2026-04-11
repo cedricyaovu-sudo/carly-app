@@ -1,7 +1,24 @@
-import { useState, useEffect, useMemo } from 'react';
-import { supabase } from '../lib/supabase';
-import { getGasPrices } from '../services/gasPriceService';
-import { useBooking } from '../contexts/BookingContext';
+// Static Constants
+const FALLBACK_PRICES = {
+    'Gas Refueling': 0,
+    'EV Recharging': 2500,
+    'Detailing': 10000,
+    'Maintenance': 5000,
+    'Paint Correction': 25000,
+    'Ceramic Coating': 50000,
+    'Mechanic Work': 7500,
+    'Service': 2000,
+    coating: 10000,
+    mechanic: 4500,
+    sun: 597, tos: 891, sma: 546, fri: 596, var: 2997, chz: 597, gfc: 507, dot: 972, waf: 296, fam: 866, aho: 581, rol: 371, rice: 417, pud: 600, mot: 1256, fru: 783, res: 375, awrb: 1293, pep: 900, preb: 900, c4e: 408, cel: 342, mon: 402, aln: 2997, red: 1617, gat: 1617, koo: 300, pop: 224, boo: 6365
+};
+
+const ADD_ON_MAP = {
+    recharging: 'EV Recharging', 'ev-recharging': 'EV Recharging', detailing: 'Detailing', maintenance: 'Maintenance', coating: 'Ceramic Coating', mechanic: 'Mechanic Work', refueling: 'Gas Refueling', 'paint-correction': 'Paint Correction',
+    sun: 'SunChips (7 oz)', tos: 'Tostitos Scoops (14.5 oz)', sma: 'Smash Kitchen Kettle Chips (6 oz)', fri: 'Fritos Corn Chips (9.25 oz)', var: 'Frito-Lay 42-pack chips', chz: 'Cheez-It Crackers (12.4 oz)', gfc: 'Gluten-free Cheez-It (9 oz)', dot: 'Dot’s Snack Mix (14 oz)', waf: 'Great Value Wafer Cookies (8 oz)', fam: 'Famous Amos (10-pack)', aho: 'Chips Ahoy (9.6 oz)', rol: 'Swiss Rolls (6 count)', rice: 'Rice Krispies Treats (8 ct)', pud: 'Snack Pack pudding (12 ct)', mot: 'Mott’s Fruit Snacks (40 pack)', fru: 'Fruit Roll-Ups variety pack', res: 'Reese’s King Size', awrb: 'A&W Root Beer (12-pack)', pep: 'Pepsi (12-pack)', preb: 'Prebiotic Pepsi (8-pack)', c4e: 'C4 Energy (16 oz can)', cel: 'CELSIUS (12 oz can)', mon: 'Monster Energy (16 oz)', aln: 'Alani Nu (12-pack)', red: 'Red Bull (4-pack)', gat: 'Gatorade variety pack (18-pack)', koo: 'Kool-Aid Bursts (6-pack)', pop: 'Poppi prebiotic soda', boo: 'BOOST nutritional drinks (24-pack)'
+};
+
+const DELIVERY_FEE_CENTS = 800;
 
 export const usePricing = () => {
     const { bookingData } = useBooking();
@@ -9,65 +26,6 @@ export const usePricing = () => {
     const [servicePrices, setServicePrices] = useState({});
     const [loading, setLoading] = useState(true);
     const [pricingConfig, setPricingConfig] = useState({});
-
-    // Surge Logic Helpers
-    const getSurgeMultiplier = (dateTimeStr, cfg) => {
-        return 1.0;
-    };
-
-    const getTaxRate = (location, cfg) => {
-        if (!location) return (cfg.tax_rate_ga ?? 7.50) / 100;
-        const loc = location.toUpperCase();
-        if (loc.includes('TX') || loc.includes('TEXAS')) return (cfg.tax_rate_tx ?? 8.25) / 100;
-        return (cfg.tax_rate_ga ?? 7.50) / 100;
-    };
-
-    // Fallback prices in cents
-    const FALLBACK_PRICES = {
-        'Gas Refueling': 0,
-        'EV Recharging': 2500,
-        'Detailing': 10000,
-        'Maintenance': 5000,
-        'Paint Correction': 25000,
-        'Ceramic Coating': 50000,
-        'Mechanic Work': 7500,
-        'Service': 2000,
-        // Add-ons
-        coating: 10000,
-        mechanic: 4500,
-        // Snack Marketplace Items (in cents)
-        sun: 597,
-        tos: 891,
-        sma: 546,
-        fri: 596,
-        var: 2997,
-        chz: 597,
-        gfc: 507,
-        dot: 972,
-        waf: 296,
-        fam: 866,
-        aho: 581,
-        rol: 371,
-        rice: 417,
-        pud: 600,
-        mot: 1256,
-        fru: 783,
-        res: 375,
-        awrb: 1293,
-        pep: 900,
-        preb: 900,
-        c4e: 408,
-        cel: 342,
-        mon: 402,
-        aln: 2997,
-        red: 1617,
-        gat: 1617,
-        koo: 300,
-        pop: 224,
-        boo: 6365
-    };
-
-    const DELIVERY_FEE = 800; // $8.00
 
     useEffect(() => {
         const fetchPrices = async () => {
@@ -112,52 +70,19 @@ export const usePricing = () => {
         fetchPrices();
     }, []);
 
-    // Helper map for add-on IDs to display names if needed
-    const addOnMap = {
-        recharging: 'EV Recharging',
-        'ev-recharging': 'EV Recharging',
-        detailing: 'Detailing',
-        maintenance: 'Maintenance',
-        coating: 'Ceramic Coating',
-        mechanic: 'Mechanic Work',
-        refueling: 'Gas Refueling',
-        'paint-correction': 'Paint Correction',
-        // Snack Mapping
-        sun: 'SunChips (7 oz)',
-        tos: 'Tostitos Scoops (14.5 oz)',
-        sma: 'Smash Kitchen Kettle Chips (6 oz)',
-        fri: 'Fritos Corn Chips (9.25 oz)',
-        var: 'Frito-Lay 42-pack chips',
-        chz: 'Cheez-It Crackers (12.4 oz)',
-        gfc: 'Gluten-free Cheez-It (9 oz)',
-        dot: 'Dot’s Snack Mix (14 oz)',
-        waf: 'Great Value Wafer Cookies (8 oz)',
-        fam: 'Famous Amos (10-pack)',
-        aho: 'Chips Ahoy (9.6 oz)',
-        rol: 'Swiss Rolls (6 count)',
-        rice: 'Rice Krispies Treats (8 ct)',
-        pud: 'Snack Pack pudding (12 ct)',
-        mot: 'Mott’s Fruit Snacks (40 pack)',
-        fru: 'Fruit Roll-Ups variety pack',
-        res: 'Reese’s King Size',
-        awrb: 'A&W Root Beer (12-pack)',
-        pep: 'Pepsi (12-pack)',
-        preb: 'Prebiotic Pepsi (8-pack)',
-        c4e: 'C4 Energy (16 oz can)',
-        cel: 'CELSIUS (12 oz can)',
-        mon: 'Monster Energy (16 oz)',
-        aln: 'Alani Nu (12-pack)',
-        red: 'Red Bull (4-pack)',
-        gat: 'Gatorade variety pack (18-pack)',
-        koo: 'Kool-Aid Bursts (6-pack)',
-        pop: 'Poppi prebiotic soda',
-        boo: 'BOOST nutritional drinks (24-pack)'
-    };
+    // Helper Functions
+    const getSurgeMultiplier = useCallback(() => 1.0, []);
 
-    const getServicePrice = (serviceName, details = {}) => {
+    const getTaxRate = useCallback((location, cfg) => {
+        if (!location) return (cfg.tax_rate_ga ?? 7.50) / 100;
+        const loc = location.toUpperCase();
+        if (loc.includes('TX') || loc.includes('TEXAS')) return (cfg.tax_rate_tx ?? 8.25) / 100;
+        return (cfg.tax_rate_ga ?? 7.50) / 100;
+    }, []);
+
+    const getServicePrice = useCallback((serviceName, details = {}) => {
         const cfg = pricingConfig;
         let price = 0;
-
         const vTypeRaw = details.vehicleType || (details.isSemiTruck ? 'Semi Truck' : 'Sedan');
         const vType = vTypeRaw.toLowerCase().replace(/ /g, '_');
 
@@ -172,7 +97,6 @@ export const usePricing = () => {
             const type = details.type || 'full';
             const vehicleKey = `detailing_${vType}`;
             const baseKey = `detailing_base_${type}`;
-            // Use vehicle-specific price if available, otherwise fallback to base price for that type
             price = (cfg[vehicleKey] ?? cfg[baseKey] ?? (type === 'interior' ? 49.99 : type === 'exterior' ? 39.99 : 79.99)) * 100;
         } else if (serviceName === 'EV Recharging') {
             price = (cfg.ev_charge_per_kwh ?? 0.35) * 100;
@@ -183,31 +107,23 @@ export const usePricing = () => {
         } else {
             price = servicePrices[serviceName] ?? FALLBACK_PRICES[serviceName] ?? FALLBACK_PRICES['Service'];
         }
-
         return price;
-    };
+    }, [pricingConfig, servicePrices]);
 
-    const getServiceTotal = (serviceName, details = {}) => {
+    const getServiceTotal = useCallback((serviceName, details = {}) => {
         const carCount = details.carCount || 1;
-        
         if (['Detailing', 'Paint Correction', 'Ceramic Coating'].includes(serviceName)) {
             const cars = details.vehicleTypes || [details.vehicleType || 'Sedan'];
-            const durations = details.durations || []; 
+            const durations = details.durations || [];
             return cars.reduce((acc, car, idx) => {
                 const carDuration = durations[idx] || details.duration || '2yr';
                 return acc + getServicePrice(serviceName, { ...details, vehicleType: car, duration: carDuration });
             }, 0);
         }
-        
         const unitPrice = getServicePrice(serviceName, details);
-        
-        if (serviceName === 'EV Recharging') {
-            const kwh = details.kwh || 50;
-            return unitPrice * kwh * carCount;
-        }
-        
+        if (serviceName === 'EV Recharging') return unitPrice * (details.kwh || 50) * carCount;
         return unitPrice * carCount;
-    };
+    }, [getServicePrice]);
 
     const calculateSubtotal = useMemo(() => {
         const refuelDetails = bookingData.details?.['Gas Refueling'];
@@ -250,7 +166,7 @@ export const usePricing = () => {
         if (bookingData.details?.addOns) {
             Object.entries(bookingData.details.addOns).forEach(([key, value]) => {
                 if (value > 0 && key !== 'coating') {
-                    const displayName = addOnMap[key] || key;
+                    const displayName = ADD_ON_MAP[key] || key;
                     if (!servicesToProcess.includes(displayName)) {
                         const price = servicePrices[displayName] ?? FALLBACK_PRICES[key] ?? 0;
                         total += price * value;
@@ -260,7 +176,7 @@ export const usePricing = () => {
         }
 
         return total;
-    }, [bookingData, gasPrices, servicePrices, pricingConfig, addOnMap, FALLBACK_PRICES, getServiceTotal]);
+    }, [bookingData, gasPrices, servicePrices, pricingConfig, getServiceTotal, getSurgeMultiplier]);
 
     // Promo Discount Logic
     const promoDiscount = useMemo(() => {
@@ -361,7 +277,7 @@ export const usePricing = () => {
         if (bookingData.details?.addOns) {
             Object.entries(bookingData.details.addOns).forEach(([key, value]) => {
                 if (value > 0 && key !== 'coating') {
-                    const displayName = addOnMap[key] || key;
+                    const displayName = ADD_ON_MAP[key] || key;
                     if (!servicesToProcess.includes(displayName)) {
                         const price = servicePrices[displayName] ?? FALLBACK_PRICES[key] ?? 0;
                         breakdown.push({
@@ -375,17 +291,15 @@ export const usePricing = () => {
             });
         }
 
-
-
         return breakdown;
-    }, [bookingData, servicePrices, pricingConfig, FALLBACK_PRICES, addOnMap, fuelCostOnly, getServiceTotal]);
+    }, [bookingData, servicePrices, pricingConfig, fuelCostOnly, getServiceTotal, getSurgeMultiplier, getServicePrice]);
 
     const taxRate = getTaxRate(bookingData.location, pricingConfig);
     const taxes = Math.round((calculateSubtotal - promoDiscount) * taxRate);
     const serviceFeeBase = Math.round(calculateSubtotal * ((pricingConfig.service_fee_percent ?? 0) / 100));
 
     const deliveryFee = (pricingConfig.fuel_delivery_fee ?? 8.00) * 100;
-    const totalWithoutTax = calculateSubtotal - promoDiscount + taxes + deliveryFee + serviceFeeBase;
+    const finalTotal = calculateSubtotal - promoDiscount + taxes + deliveryFee + serviceFeeBase;
 
     return {
         gasPrices,
@@ -399,10 +313,10 @@ export const usePricing = () => {
         taxes,
         deliveryFee,
         serviceFee: serviceFeeBase,
-        totalBeforePromo: totalWithoutTax, // This actually includes promo now due to calculation
+        finalTotal,
         loading,
         FALLBACK_PRICES,
-        addOnMap,
+        ADD_ON_MAP,
         pricingConfig,
         isPlaceholderActive: !!bookingData.details?.['Gas Refueling']?.placeholderType
     };

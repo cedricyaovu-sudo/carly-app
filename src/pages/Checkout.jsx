@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useState, useEffect } from 'react';
 import { Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -24,7 +23,8 @@ const CheckoutForm = (props) => {
 
     const sendConfirmationEmail = async (totalAmount) => {
         try {
-            const response = await fetch('https://ugqjyfgcosjajazsdydw.supabase.co/functions/v1/send-booking-confirmation', {
+            const SUPABASE_FUNCTIONS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
+            const response = await fetch(`${SUPABASE_FUNCTIONS_URL}/send-booking-confirmation`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -173,7 +173,7 @@ const CheckoutForm = (props) => {
 };
 
 const Checkout = () => {
-    const { bookingData } = useBooking();
+    const { bookingData, updateBooking } = useBooking();
     const [clientSecret, setClientSecret] = useState('');
     const [serverAmount, setServerAmount] = useState(0);
     const [serverTrace, setServerTrace] = useState([]);
@@ -200,7 +200,8 @@ const Checkout = () => {
     const fetchPaymentIntent = (data, promo, gPrices) => {
         setError(null);
         console.log('Fetching Secure Payment Intent...');
-        fetch('https://ugqjyfgcosjajazsdydw.supabase.co/functions/v1/create-payment-intent', {
+        const SUPABASE_FUNCTIONS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
+        fetch(`${SUPABASE_FUNCTIONS_URL}/create-payment-intent`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
