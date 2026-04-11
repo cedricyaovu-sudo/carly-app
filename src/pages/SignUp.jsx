@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 import { Car, ArrowLeft } from 'lucide-react';
 
 
@@ -35,6 +36,10 @@ const SignUp = () => {
             });
 
             if (user) {
+                await supabase
+                    .from('profiles')
+                    .update({ onboarding_completed: true })
+                    .eq('id', user.id);
                 navigate('/new-service');
             }
         } catch (err) {
