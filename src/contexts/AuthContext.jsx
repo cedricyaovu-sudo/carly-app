@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
         try {
             const { data, error } = await supabase
                 .from('profiles')
-                .select('*')
+                .select('role, onboarding_completed, is_gofuel_pro, avatar_url')
                 .eq('id', userId)
                 .single();
             if (error) throw error;
@@ -91,7 +91,10 @@ export const AuthProvider = ({ children }) => {
         user,
         profile,
         loading,
-        refreshProfile: () => user && fetchProfile(user.id)
+        refreshProfile: (userId) => {
+            const id = userId || user?.id;
+            return id ? fetchProfile(id) : Promise.resolve();
+        }
     }), [signUp, signIn, signOut, user, profile, loading, fetchProfile]);
 
     return (

@@ -12,7 +12,7 @@ const SignUp = () => {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { signUp } = useAuth();
+    const { signUp, refreshProfile } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -29,17 +29,20 @@ const SignUp = () => {
 
             setLoading(true);
 
-            // Sign up user
             const { user } = await signUp(email, password, {
                 username: username,
                 phone_number: phoneNumber
             });
 
             if (user) {
+                // Wait for the profile row to be created by the DB trigger
+                await new Promise(r => setTimeout(r, 1000));
                 await supabase
                     .from('profiles')
                     .update({ onboarding_completed: true })
                     .eq('id', user.id);
+                // Refresh the cached profile so the guard sees the updated value
+                if (refreshProfile) await refreshProfile(user.id);
                 navigate('/new-service');
             }
         } catch (err) {
