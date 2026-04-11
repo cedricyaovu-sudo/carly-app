@@ -35,12 +35,21 @@ const SignUp = () => {
             });
 
             if (user) {
-                // Wait for the profile row to be created by the DB trigger
-                await new Promise(r => setTimeout(r, 1000));
-                await supabase
-                    .from('profiles')
-                    .update({ onboarding_completed: true })
-                    .eq('id', user.id);
+                // Wait for the profile row to be created by the DB trigger and update it
+                let retries = 5;
+                let success = false;
+                while (retries > 0 && !success) {
+                    await new Promise(r => setTimeout(r, 1000));
+                    const { error } = await supabase
+                        .from('profiles')
+                        .update({ onboarding_completed: true })
+                        .eq('id', user.id);
+                    if (!error) {
+                        success = true;
+                    }
+                    retries--;
+                }
+                
                 // Refresh the cached profile so the guard sees the updated value
                 if (refreshProfile) await refreshProfile(user.id);
                 navigate('/new-service');
@@ -48,6 +57,23 @@ const SignUp = () => {
         } catch (err) {
             setError('Failed to create account: ' + err.message);
         } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleOAuth = async (provider) => {
+        try {
+            setLoading(true);
+            setError('');
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: provider,
+                options: {
+                    redirectTo: `${window.location.origin}/new-service`
+                }
+            });
+            if (error) throw error;
+        } catch (err) {
+            setError(`Failed to sign in with ${provider}: ` + err.message);
             setLoading(false);
         }
     };
@@ -160,7 +186,7 @@ const SignUp = () => {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: 'var(--spacing-lg)' }}>
-                    <button style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', cursor: 'pointer', fontSize: '15px', fontWeight: '600', color: 'var(--color-text-heading)' }}>
+                    <button type="button" onClick={() => handleOAuth('google')} style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', cursor: 'pointer', fontSize: '15px', fontWeight: '600', color: 'var(--color-text-heading)' }}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M22.56 12.25C22.56 11.47 22.49 10.72 22.36 10H12V14.26H17.92C17.67 15.63 16.86 16.8 15.69 17.58V20.34H19.26C21.35 18.42 22.56 15.6 22.56 12.25Z" fill="#4285F4" />
                             <path d="M12 23C14.97 23 17.46 22.02 19.26 20.34L15.69 17.58C14.71 18.24 13.46 18.66 12 18.66C9.17 18.66 6.78 16.75 5.9 14.18H2.23V17.03C4.04 20.62 7.71 23 12 23Z" fill="#34A853" />
@@ -169,14 +195,14 @@ const SignUp = () => {
                         </svg>
                         Continue with Google
                     </button>
-                    <button style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', cursor: 'pointer', fontSize: '15px', fontWeight: '600', color: 'var(--color-text-heading)' }}>
+                    <button type="button" onClick={() => handleOAuth('apple')} style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', cursor: 'pointer', fontSize: '15px', fontWeight: '600', color: 'var(--color-text-heading)' }}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12.15 16.924C11.523 16.924 10.638 16.48 9.61 16.48C8.188 16.48 6.84 17.307 6.104 18.597C4.545 21.312 5.684 25.32 7.21 27.526C7.946 28.583 8.814 29.771 9.946 29.742C11.05 29.712 11.485 29.049 12.802 29.049C14.119 29.049 14.502 29.742 15.666 29.712C16.859 29.684 17.618 28.611 18.36 27.526C19.223 26.257 19.585 25.019 19.6 24.956C19.571 24.94 18.375 24.484 18.355 23.084C18.336 21.91 19.297 21.325 19.345 21.294C18.736 20.395 17.788 19.923 17.391 19.882C16.035 19.74 14.654 20.675 13.987 20.675C13.311 20.675 12.186 19.794 11.026 19.824C11.394 18.428 12.528 17.359 13.684 16.923Z" transform="translate(0, -6)" />
                             <path d="M14.986 13.791C15.541 13.111 15.91 12.158 15.808 11.2C14.975 11.235 13.939 11.761 13.362 12.441C12.84 13.045 12.4 14.026 12.528 14.958C13.456 15.028 14.432 14.471 14.986 13.791Z" transform="translate(0, -6)" />
                         </svg>
                         Continue with Apple
                     </button>
-                    <button style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', cursor: 'pointer', fontSize: '15px', fontWeight: '600', color: 'var(--color-text-heading)' }}>
+                    <button type="button" onClick={() => handleOAuth('facebook')} style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', cursor: 'pointer', fontSize: '15px', fontWeight: '600', color: 'var(--color-text-heading)' }}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2">
                             <path d="M23.998 12C23.998 5.373 18.626 0 12 0C5.373 0 0 5.373 0 12C0 17.989 4.388 22.954 10.125 23.854V15.469H7.078V12H10.125V9.356C10.125 6.349 11.917 4.688 14.658 4.688C15.971 4.688 17.344 4.922 17.344 4.922V7.875H15.831C14.34 7.875 13.875 8.8 13.875 9.75V12H17.203L16.672 15.469H13.875V23.854C19.613 22.954 23.998 17.989 23.998 12Z" />
                         </svg>

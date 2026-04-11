@@ -62,11 +62,6 @@ const OnboardingGuard = () => {
 
   if (user && !profile) return <LoadingOverlay />;
 
-  if (profile?.role === 'admin') return <Outlet />;
-
-  if (user && profile && !profile.onboarding_completed) {
-    return <Navigate to="/onboarding" replace />;
-  }
   return <Outlet />;
 };
 
