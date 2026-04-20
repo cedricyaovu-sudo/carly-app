@@ -93,7 +93,8 @@ const PaywallCheckout = () => {
     }
 
     // Fallback if prefetch wasn't triggered or failed
-    fetch('https://ugqjyfgcosjajazsdydw.supabase.co/functions/v1/create-payment-intent', {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    fetch(`${supabaseUrl}/functions/v1/create-payment-intent`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

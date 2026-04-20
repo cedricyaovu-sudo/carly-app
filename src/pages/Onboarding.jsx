@@ -186,7 +186,7 @@ const Onboarding = () => {
               <div style={{
                 margin: '-24px -24px 32px -24px',
                 height: '45vh',
-                backgroundImage: 'url(/gofuel_onboarding_bg.png)',
+                backgroundImage: 'url(/gofuel_onboarding_bg_v3.png)',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 position: 'relative'
