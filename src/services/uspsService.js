@@ -1,7 +1,5 @@
 import { supabase } from '../lib/supabase';
 
-let lastFailedAddress = '';
-
 export const verifyAddressWithUSPS = async (inputAddress) => {
     if (!inputAddress || typeof inputAddress !== 'string' || !inputAddress.trim()) {
         return { isValid: false, message: 'Please enter an address' };
@@ -19,8 +17,9 @@ export const verifyAddressWithUSPS = async (inputAddress) => {
         }
 
         if (data && !data.isValid) {
+            const lastFailedAddress = sessionStorage.getItem('carly_usps_failed_addr');
             if (lastFailedAddress !== inputAddress) {
-                lastFailedAddress = inputAddress;
+                sessionStorage.setItem('carly_usps_failed_addr', inputAddress);
                 return { isValid: false, message: data.message ? `${data.message} Click again to proceed anyway.` : 'Invalid address. Click again to proceed anyway.' };
             } else {
                 // Bypass on second attempt
@@ -30,7 +29,7 @@ export const verifyAddressWithUSPS = async (inputAddress) => {
 
         // Reset if success
         if (data && data.isValid) {
-            lastFailedAddress = '';
+            sessionStorage.removeItem('carly_usps_failed_addr');
         }
 
         return data; // Returns { isValid: boolean, message?: string, standardized?: object }

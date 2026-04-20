@@ -197,50 +197,49 @@ const Checkout = () => {
     const [promoCode, setPromoCode] = useState('');
     const [promoMessage, setPromoMessage] = useState('');
 
-    const fetchPaymentIntent = (data, promo, gPrices) => {
-        setError(null);
-        console.log('Fetching Secure Payment Intent...');
-        const SUPABASE_FUNCTIONS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
-        fetch(`${SUPABASE_FUNCTIONS_URL}/create-payment-intent`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
-            },
-            body: JSON.stringify({ 
-                bookingData: data,
-                promoCode: promo,
-                gasPrices: gPrices
-            }),
-        })
-            .then((res) => {
-                if (!res.ok) {
-                    return res.json().then(json => Promise.reject(json));
-                }
-                return res.json();
-            })
-            .then((data) => {
-                console.log('Secure Payment Intent Response:', data);
-                if (data.debug) {
-                    console.log('Backend Pricing Debug:', data.debug);
-                }
-                if (data.trace) {
-                    console.log('Backend Trace:', data.trace);
-                    setServerTrace(data.trace);
-                } else {
-                    setServerTrace([]);
-                }
-                setClientSecret(data.clientSecret);
-                setServerAmount(data.amount);
-            })
-            .catch((err) => {
-                console.error('Error fetching payment intent:', err);
-                setError(err.error || 'Failed to load payment details');
-            });
-    };
-
-    // 2. Fetch Payment Intent when booking data or promo changes
     useEffect(() => {
+        const fetchPaymentIntent = (data, promo, gPrices) => {
+            setError(null);
+            console.log('Fetching Secure Payment Intent...');
+            const SUPABASE_FUNCTIONS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
+            fetch(`${SUPABASE_FUNCTIONS_URL}/create-payment-intent`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+                },
+                body: JSON.stringify({ 
+                    bookingData: data,
+                    promoCode: promo,
+                    gasPrices: gPrices
+                }),
+            })
+                .then((res) => {
+                    if (!res.ok) {
+                        return res.json().then(json => Promise.reject(json));
+                    }
+                    return res.json();
+                })
+                .then((data) => {
+                    console.log('Secure Payment Intent Response:', data);
+                    if (data.debug) {
+                        console.log('Backend Pricing Debug:', data.debug);
+                    }
+                    if (data.trace) {
+                        console.log('Backend Trace:', data.trace);
+                        setServerTrace(data.trace);
+                    } else {
+                        setServerTrace([]);
+                    }
+                    setClientSecret(data.clientSecret);
+                    setServerAmount(data.amount);
+                })
+                .catch((err) => {
+                    console.error('Error fetching payment intent:', err);
+                    setError(err.error || 'Failed to load payment details');
+                });
+        };
+
         if (!pricingLoading) {
             fetchPaymentIntent(bookingData, promoCode, gasPrices);
         }

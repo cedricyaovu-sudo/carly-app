@@ -33,6 +33,14 @@ export const BookingProvider = ({ children }) => {
         }));
     }, []);
 
+    const getCache = useCallback((key) => {
+        const lastUpd = cache.lastUpdated[key];
+        if (!lastUpd || Date.now() - lastUpd > 5 * 60 * 1000) {
+            return null;
+        }
+        return cache[key];
+    }, [cache]);
+
     const updateBooking = useCallback((data) => {
         setBookingData(prev => {
             const newData = { ...prev, ...data };
@@ -103,8 +111,9 @@ export const BookingProvider = ({ children }) => {
         markServiceVisited,
         getNextServiceRoute,
         cache,
-        updateCache
-    }), [bookingData, updateBooking, resetBooking, markServiceVisited, getNextServiceRoute, cache, updateCache]);
+        updateCache,
+        getCache
+    }), [bookingData, updateBooking, resetBooking, markServiceVisited, getNextServiceRoute, cache, updateCache, getCache]);
 
     return (
         <BookingContext.Provider value={value}>
