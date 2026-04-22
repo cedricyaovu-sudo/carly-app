@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Lock, ArrowLeft, ShieldCheck } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
@@ -77,6 +77,9 @@ const CheckoutForm = ({ onVerified }) => {
 
 const PaywallCheckout = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const planParam = searchParams.get('plan');
+  const selectedPlan = planParam === 'monthly' ? 'monthly' : 'annual';
   const { isDarkMode } = useTheme();
   const { user, refreshProfile } = useAuth();
   const [clientSecret, setClientSecret] = useState('');
@@ -138,6 +141,7 @@ const PaywallCheckout = () => {
       body: JSON.stringify({
         userId: user?.id,
         paymentIntentId: piId,
+        plan: selectedPlan,
       }),
     });
 
@@ -174,7 +178,7 @@ const PaywallCheckout = () => {
       customerEmail: user?.email,
       customerName: user?.user_metadata?.full_name,
       details: {
-        plan: 'GoFuel Pro',
+        plan: selectedPlan === 'monthly' ? 'GoFuel Monthly ($24.99/mo)' : 'GoFuel Annual ($249.99/yr)',
         trialDays: 7,
         subscriptionId: subscription.subscriptionId,
         customerId: subscription.customerId || customerId,

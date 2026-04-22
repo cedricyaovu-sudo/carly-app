@@ -20,7 +20,7 @@ const Paywall = () => {
   };
 
   const handleSubscribe = () => {
-    navigate('/paywall-checkout');
+    navigate(`/paywall-checkout?plan=${selectedPlan}`);
   };
 
   const benefits = [
