@@ -4,53 +4,128 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { Car, ArrowLeft } from 'lucide-react';
 
+// --- Validation helpers ------------------------------------------------------
+// Keep these pure so they're easy to reason about and unit-test later.
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+const isValidEmail = (value) => {
+    if (!value) return false;
+    const trimmed = value.trim();
+    if (trimmed.length > 254) return false;
+    return EMAIL_REGEX.test(trimmed);
+};
+
+// Strip everything except digits, then require a US-style 10-digit number
+// (optionally with a leading "1"). Covers the vast majority of real inputs
+// without over-constraining international numbers.
+const digitsOnly = (value) => (value || '').replace(/\D/g, '');
+
+const isValidPhone = (value) => {
+    const digits = digitsOnly(value);
+    if (digits.length === 10) return true;
+    if (digits.length === 11 && digits.startsWith('1')) return true;
+    return false;
+};
+
+// Pretty format as the user types: (555) 123-4567.
+const formatPhone = (value) => {
+    const d = digitsOnly(value).slice(0, 11);
+    const body = d.length === 11 && d.startsWith('1') ? d.slice(1) : d;
+    if (body.length === 0) return '';
+    if (body.length < 4) return `(${body}`;
+    if (body.length < 7) return `(${body.slice(0, 3)}) ${body.slice(3)}`;
+    return `(${body.slice(0, 3)}) ${body.slice(3, 6)}-${body.slice(6, 10)}`;
+};
+
+const isValidUsername = (value) => (value || '').trim().length >= 2;
+
+const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+const isValidPassword = (value) => PASSWORD_REGEX.test(value || '');
+
+// --- Small field-error display component ------------------------------------
+
+const FieldError = ({ children }) => (
+    <div style={{ color: '#DC2626', fontSize: '13px', marginTop: '6px' }}>
+        {children}
+    </div>
+);
+
+// --- SignUp page ------------------------------------------------------------
 
 const SignUp = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
+
+    const [touched, setTouched] = useState({
+        username: false,
+        phoneNumber: false,
+        email: false,
+        password: false,
+    });
+
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const { signUp, refreshProfile } = useAuth();
     const navigate = useNavigate();
 
+    const fieldErrors = {
+        username: isValidUsername(username) ? '' : 'Please enter a valid username (at least 2 characters).',
+        phoneNumber: isValidPhone(phoneNumber) ? '' : 'Please enter a valid phone number (e.g. (555) 123-4567).',
+        email: isValidEmail(email) ? '' : 'Please enter a valid email address.',
+        password: isValidPassword(password)
+            ? ''
+            : 'Password must be at least 8 characters, include one uppercase letter and one special character.',
+    };
+
+    const formIsValid = Object.values(fieldErrors).every((msg) => msg === '');
+
+    const handlePhoneChange = (e) => {
+        setPhoneNumber(formatPhone(e.target.value));
+    };
+
+    const markTouched = (field) => () =>
+        setTouched((prev) => ({ ...prev, [field]: true }));
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            setError('');
-            
-            // Stronger password validation
-            const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
-            if (!passwordRegex.test(password)) {
-                setError('Password must be at least 8 characters long, contain at least one uppercase letter and one special character.');
-                return;
-            }
+        setError('');
 
+        // Surface every error if they try to submit.
+        setTouched({ username: true, phoneNumber: true, email: true, password: true });
+        if (!formIsValid) {
+            setError('Please fix the highlighted fields and try again.');
+            return;
+        }
+
+        try {
             setLoading(true);
 
-            const { user } = await signUp(email, password, {
-                username: username,
-                phone_number: phoneNumber
+            const normalizedPhone = digitsOnly(phoneNumber);
+            const e164Phone = normalizedPhone.length === 11
+                ? `+${normalizedPhone}`
+                : `+1${normalizedPhone}`;
+
+            const { user } = await signUp(email.trim(), password, {
+                username: username.trim(),
+                phone_number: e164Phone,
             });
 
             if (user) {
-                // Wait for the profile row to be created by the DB trigger and update it
                 let retries = 5;
                 let success = false;
                 while (retries > 0 && !success) {
-                    await new Promise(r => setTimeout(r, 1000));
-                    const { error } = await supabase
+                    await new Promise((r) => setTimeout(r, 1000));
+                    const { error: updateErr } = await supabase
                         .from('profiles')
                         .update({ onboarding_completed: true })
                         .eq('id', user.id);
-                    if (!error) {
-                        success = true;
-                    }
+                    if (!updateErr) success = true;
                     retries--;
                 }
-                
-                // Refresh the cached profile so the guard sees the updated value
+
                 if (refreshProfile) await refreshProfile(user.id);
                 navigate('/new-service');
             }
@@ -66,16 +141,33 @@ const SignUp = () => {
             setLoading(true);
             setError('');
             const { error } = await supabase.auth.signInWithOAuth({
-                provider: provider,
+                provider,
                 options: {
-                    redirectTo: `${window.location.origin}/new-service`
-                }
+                    redirectTo: `${window.location.origin}/new-service`,
+                },
             });
             if (error) throw error;
         } catch (err) {
             setError(`Failed to sign in with ${provider}: ` + err.message);
             setLoading(false);
         }
+    };
+
+    const inputBaseStyle = {
+        width: '100%',
+        padding: '12px',
+        borderRadius: 'var(--radius-md)',
+        fontSize: '16px',
+        outline: 'none',
+    };
+
+    const inputStyle = (fieldName) => {
+        const showError = touched[fieldName] && fieldErrors[fieldName];
+        return {
+            ...inputBaseStyle,
+            border: `1px solid ${showError ? '#DC2626' : 'var(--color-border)'}`,
+            boxShadow: showError ? '0 0 0 3px rgba(220,38,38,0.12)' : 'none',
+        };
     };
 
     return (
@@ -101,71 +193,78 @@ const SignUp = () => {
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+                <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
                     <div>
                         <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Username</label>
                         <input
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
+                            onBlur={markTouched('username')}
                             required
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                borderRadius: 'var(--radius-md)',
-                                border: '1px solid var(--color-border)',
-                                fontSize: '16px'
-                            }}
+                            autoComplete="username"
+                            aria-invalid={Boolean(touched.username && fieldErrors.username)}
+                            style={inputStyle('username')}
                         />
+                        {touched.username && fieldErrors.username && (
+                            <FieldError>{fieldErrors.username}</FieldError>
+                        )}
                     </div>
+
                     <div>
                         <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Phone Number</label>
                         <input
                             type="tel"
                             value={phoneNumber}
-                            onChange={(e) => setPhoneNumber(e.target.value)}
+                            onChange={handlePhoneChange}
+                            onBlur={markTouched('phoneNumber')}
                             required
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                borderRadius: 'var(--radius-md)',
-                                border: '1px solid var(--color-border)',
-                                fontSize: '16px'
-                            }}
+                            autoComplete="tel"
+                            placeholder="(555) 123-4567"
+                            inputMode="tel"
+                            aria-invalid={Boolean(touched.phoneNumber && fieldErrors.phoneNumber)}
+                            style={inputStyle('phoneNumber')}
                         />
+                        {touched.phoneNumber && fieldErrors.phoneNumber && (
+                            <FieldError>{fieldErrors.phoneNumber}</FieldError>
+                        )}
                     </div>
+
                     <div>
                         <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Email</label>
                         <input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            onBlur={markTouched('email')}
                             required
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                borderRadius: 'var(--radius-md)',
-                                border: '1px solid var(--color-border)',
-                                fontSize: '16px'
-                            }}
+                            autoComplete="email"
+                            inputMode="email"
+                            placeholder="you@example.com"
+                            aria-invalid={Boolean(touched.email && fieldErrors.email)}
+                            style={inputStyle('email')}
                         />
+                        {touched.email && fieldErrors.email && (
+                            <FieldError>{fieldErrors.email}</FieldError>
+                        )}
                     </div>
+
                     <div>
                         <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Password</label>
                         <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            onBlur={markTouched('password')}
                             required
                             minLength={8}
-                            style={{
-                                width: '100%',
-                                padding: '12px',
-                                borderRadius: 'var(--radius-md)',
-                                border: '1px solid var(--color-border)',
-                                fontSize: '16px'
-                            }}
+                            autoComplete="new-password"
+                            aria-invalid={Boolean(touched.password && fieldErrors.password)}
+                            style={inputStyle('password')}
                         />
+                        {touched.password && fieldErrors.password && (
+                            <FieldError>{fieldErrors.password}</FieldError>
+                        )}
                     </div>
 
                     <button
