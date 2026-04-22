@@ -10,7 +10,7 @@ import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-
 import { showSuccess, showError } from '../components/ui/Toast';
 import { notifyCeo } from '../lib/notifyCeo';
 
-const CheckoutForm = ({ onSubscribe, mode }) => {
+const CheckoutForm = ({ onVerified }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
@@ -25,29 +25,27 @@ const CheckoutForm = ({ onSubscribe, mode }) => {
     setIsLoading(true);
     setMessage(null);
 
-    // For trial subscriptions we confirm a SetupIntent (no charge today).
-    // If Stripe couldn't use a SetupIntent (e.g. the price required a first payment),
-    // we fall back to confirmPayment.
-    const confirmFn = mode === 'setup' ? stripe.confirmSetup : stripe.confirmPayment;
-    const { error, setupIntent, paymentIntent } = await confirmFn({
+    const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       redirect: 'if_required'
     });
-
-    const intent = setupIntent || paymentIntent;
-    const ok = intent && (intent.status === 'succeeded' || intent.status === 'requires_capture');
 
     if (error) {
       setMessage(error.message);
       showError(error.message);
       setIsLoading(false);
-    } else if (ok) {
-      showSuccess('Welcome to GoFuel Pro — your 7-day free trial has started.');
-      onSubscribe();
+    } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+      try {
+        await onVerified(paymentIntent);
+      } catch (activationErr) {
+        console.error('Subscription activation failed:', activationErr);
+        setMessage(activationErr.message || 'Could not activate subscription.');
+        showError(activationErr.message || 'Could not activate subscription.');
+        setIsLoading(false);
+      }
     } else {
-      const status = intent?.status || 'unknown';
-      setMessage('Verification status: ' + status);
-      showError('Verification status: ' + status);
+      setMessage('Verification status: ' + paymentIntent.status);
+      showError('Verification status: ' + paymentIntent.status);
       setIsLoading(false);
     }
   };
@@ -57,7 +55,7 @@ const CheckoutForm = ({ onSubscribe, mode }) => {
       <div style={{ marginBottom: '32px' }}>
         <PaymentElement id="payment-element" />
       </div>
-      
+
       <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
@@ -82,8 +80,8 @@ const PaywallCheckout = () => {
   const { isDarkMode } = useTheme();
   const { user, refreshProfile } = useAuth();
   const [clientSecret, setClientSecret] = useState('');
-  const [subscriptionId, setSubscriptionId] = useState(null);
-  const [intentMode, setIntentMode] = useState('setup');
+  const [paymentIntentId, setPaymentIntentId] = useState(null);
+  const [customerId, setCustomerId] = useState(null);
   const [error, setError] = useState(null);
 
   const colors = {
@@ -96,7 +94,6 @@ const PaywallCheckout = () => {
   };
 
   useEffect(() => {
-    // Don't start a subscription until we know who the user is.
     if (!user?.email) return;
     if (clientSecret) return;
 
@@ -121,47 +118,73 @@ const PaywallCheckout = () => {
     })
     .then((data) => {
         setClientSecret(data.clientSecret);
-        setSubscriptionId(data.subscriptionId);
-        setIntentMode(data.mode || 'setup');
+        setPaymentIntentId(data.paymentIntentId);
+        setCustomerId(data.customerId);
     })
     .catch((err) => {
-        console.error('Error starting subscription:', err);
+        console.error('Error initializing trial checkout:', err);
         setError(err.error || 'Failed to initialize secure checkout');
     });
   }, [user, clientSecret]);
 
-  const handleSubscribe = async () => {
+  const activateTrialSubscription = async (piId) => {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const response = await fetch(`${supabaseUrl}/functions/v1/activate-subscription`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify({
+        userId: user?.id,
+        paymentIntentId: piId,
+      }),
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || 'Failed to activate subscription');
+    }
+    return response.json();
+  };
+
+  const handleVerified = async (paymentIntent) => {
+    const piId = paymentIntent?.id || paymentIntentId;
+
+    const subscription = await activateTrialSubscription(piId);
+
     try {
       if (user) {
         await supabase
           .from('profiles')
           .update({
             onboarding_completed: true,
-            is_gofuel_pro: true
+            is_gofuel_pro: true,
           })
           .eq('id', user.id);
 
         await refreshProfile();
       }
-
-      // Fire-and-forget email to the CEO that a new subscription just started.
-      notifyCeo({
-        type: 'subscription',
-        customerEmail: user?.email,
-        customerName: user?.user_metadata?.full_name,
-        details: {
-          plan: 'GoFuel Pro',
-          trialDays: 7,
-          subscriptionId,
-          startedAt: new Date().toISOString(),
-        },
-      });
-
-      navigate('/success');
     } catch (err) {
-      console.error('Error updating subscription:', err);
-      navigate('/success');
+      console.error('Error updating profile after subscription:', err);
     }
+
+    notifyCeo({
+      type: 'subscription',
+      customerEmail: user?.email,
+      customerName: user?.user_metadata?.full_name,
+      details: {
+        plan: 'GoFuel Pro',
+        trialDays: 7,
+        subscriptionId: subscription.subscriptionId,
+        customerId: subscription.customerId || customerId,
+        trialEnd: subscription.trialEnd,
+        startedAt: new Date().toISOString(),
+      },
+    });
+
+    showSuccess('Welcome to GoFuel Pro — your 7-day free trial has started.');
+    navigate('/success');
   };
 
   return (
@@ -176,11 +199,11 @@ const PaywallCheckout = () => {
       padding: '24px',
     }}>
       <div style={{ maxWidth: '440px', margin: '0 auto', width: '100%' }}>
-        
+
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '32px', position: 'relative' }}>
-          <button 
-            onClick={() => navigate('/paywall')} 
+          <button
+            onClick={() => navigate('/paywall')}
             type="button"
             style={{ background: 'transparent', border: 'none', color: colors.text, cursor: 'pointer', padding: '8px', marginLeft: '-8px', position: 'relative', zIndex: 10 }}
           >
@@ -207,7 +230,7 @@ const PaywallCheckout = () => {
         <div style={{ background: colors.card, padding: '24px', borderRadius: '20px', border: `1px solid ${colors.border}`, boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
           {clientSecret ? (
             <Elements options={{ clientSecret, appearance: { theme: isDarkMode ? 'night' : 'stripe' } }} stripe={stripePromise}>
-              <CheckoutForm onSubscribe={handleSubscribe} mode={intentMode} />
+              <CheckoutForm onVerified={handleVerified} />
             </Elements>
           ) : error ? (
             <div style={{ color: 'red', textAlign: 'center', padding: '20px' }}>
@@ -226,7 +249,7 @@ const PaywallCheckout = () => {
           <Lock size={14} /> Secure SSL Encryption
         </div>
         <p style={{ textAlign: 'center', color: colors.textSecondary, fontSize: '10px', marginTop: '12px', opacity: 0.8 }}>
-          *You won't be charged during your 7-day trial. After the trial ends, your card will be charged automatically unless you cancel.
+          *A $0.50 temporary authorization charge will appear to verify your card. After your 7-day free trial, your card will be charged the subscription amount unless you cancel.
         </p>
 
       </div>
