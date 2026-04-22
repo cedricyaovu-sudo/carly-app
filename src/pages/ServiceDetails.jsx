@@ -24,7 +24,7 @@ const ServiceDetails = () => {
             setAddOns(prev => ({ ...prev, ...bookingData.details.addOns }));
         }
 
-        const details = bookingData.details['Gas Refueling'];
+        const details = bookingData.details?.['Gas Refueling'];
         if (details) {
             if (details.carCount) {
                 // Use handleCarCountChange to ensure arrays are initialized first
@@ -132,7 +132,7 @@ const ServiceDetails = () => {
                     selectedServices: Array.from(new Set([...currentServices, serviceName])),
                     // Initialize carCount to 1 in the global state for this service
                     details: {
-                        [serviceName]: { ...bookingData.details[serviceName], carCount: 1 }
+                        [serviceName]: { ...(bookingData.details?.[serviceName] || {}), carCount: 1 }
                     }
                 });
             } else {
@@ -152,7 +152,7 @@ const ServiceDetails = () => {
         if (serviceName) {
             updateBooking({
                 details: {
-                    [serviceName]: { ...bookingData.details[serviceName], carCount: numCount }
+                    [serviceName]: { ...(bookingData.details?.[serviceName] || {}), carCount: numCount }
                 }
             });
         }
@@ -180,7 +180,7 @@ const ServiceDetails = () => {
             details: {
                 ...bookingData.details,
                 'Gas Refueling': {
-                    ...bookingData.details['Gas Refueling'],
+                    ...(bookingData.details?.['Gas Refueling'] || {}),
                     carCount,
                     fuelTypes,
                     gallons: gallonsArray,

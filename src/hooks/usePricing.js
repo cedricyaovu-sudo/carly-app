@@ -1,3 +1,8 @@
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { supabase } from '../lib/supabase';
+import { useBooking } from '../contexts/BookingContext';
+import { getGasPrices } from '../services/gasPriceService';
+
 // Static Constants
 const FALLBACK_PRICES = {
     'Gas Refueling': 0,

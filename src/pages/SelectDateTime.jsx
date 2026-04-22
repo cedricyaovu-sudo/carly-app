@@ -7,7 +7,7 @@ const SelectDateTime = () => {
     const navigate = useNavigate();
     const { updateBooking } = useBooking();
 
-    const minBookableDate = new Date(2026, 3, 26);
+    const minBookableDate = new Date(2026, 4, 3);
     minBookableDate.setHours(0, 0, 0, 0);
 
     // State for Calendar

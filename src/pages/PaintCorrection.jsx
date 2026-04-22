@@ -23,7 +23,7 @@ const PaintCorrection = () => {
             setAddOns(prev => ({ ...prev, ...bookingData.details.addOns }));
         }
 
-        const details = bookingData.details['Paint Correction'];
+        const details = bookingData.details?.['Paint Correction'];
         if (details) {
             if (details.carCount) {
                 handleCarCountChange(details.carCount);
@@ -115,7 +115,7 @@ const PaintCorrection = () => {
                 updateBooking({
                     selectedServices: Array.from(new Set([...currentServices, serviceName])),
                     details: {
-                        [serviceName]: { ...bookingData.details[serviceName], carCount: 1 }
+                        [serviceName]: { ...(bookingData.details?.[serviceName] || {}), carCount: 1 }
                     }
                 });
             } else {
@@ -134,7 +134,7 @@ const PaintCorrection = () => {
         if (serviceName) {
             updateBooking({
                 details: {
-                    [serviceName]: { ...bookingData.details[serviceName], carCount: numCount }
+                    [serviceName]: { ...(bookingData.details?.[serviceName] || {}), carCount: numCount }
                 }
             });
         }
@@ -168,7 +168,7 @@ const PaintCorrection = () => {
             details: {
                 ...bookingData.details,
                 'Paint Correction': {
-                    ...bookingData.details['Paint Correction'],
+                    ...(bookingData.details?.['Paint Correction'] || {}),
                     carCount,
                     vehicleTypes,
                     isSemiTruck

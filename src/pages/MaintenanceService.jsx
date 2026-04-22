@@ -25,7 +25,7 @@ const MaintenanceService = () => {
             setAddOns(prev => ({ ...prev, ...bookingData.details.addOns }));
         }
 
-        const details = bookingData.details['Maintenance'];
+        const details = bookingData.details?.['Maintenance'];
         if (details) {
             if (details.carCount) setCarCount(details.carCount);
         }
@@ -77,7 +77,7 @@ const MaintenanceService = () => {
                     selectedServices: Array.from(new Set([...currentServices, serviceName])),
                     // Initialize carCount to 1 in the global state for this service
                     details: {
-                        [serviceName]: { ...bookingData.details[serviceName], carCount: 1 }
+                        [serviceName]: { ...(bookingData.details?.[serviceName] || {}), carCount: 1 }
                     }
                 });
             } else {
@@ -98,7 +98,7 @@ const MaintenanceService = () => {
             updateBooking({
                 details: {
                     ...bookingData.details, // Preserve other details
-                    [serviceName]: { ...bookingData.details[serviceName], carCount: numCount }
+                    [serviceName]: { ...(bookingData.details?.[serviceName] || {}), carCount: numCount }
                 }
             });
         }
@@ -152,7 +152,7 @@ const MaintenanceService = () => {
             location: location || bookingData.location,
             details: {
                 ...bookingData.details,
-                [currentService]: { ...bookingData.details[currentService], carCount },
+                [currentService]: { ...(bookingData.details?.[currentService] || {}), carCount },
                 addOns: { ...bookingData.details?.addOns, ...addOns }
             }
         });

@@ -27,7 +27,7 @@ const CeramicCoating = () => {
 
         if (bookingData.location) setLocation(bookingData.location);
 
-        const details = bookingData.details['Ceramic Coating'];
+        const details = bookingData.details?.['Ceramic Coating'];
         if (details) {
             if (details.carCount) {
                 setCarCount(details.carCount);

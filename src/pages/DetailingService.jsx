@@ -23,7 +23,7 @@ const DetailingService = () => {
             setAddOns(prev => ({ ...prev, ...bookingData.details.addOns }));
         }
 
-        const details = bookingData.details['Detailing'];
+        const details = bookingData.details?.['Detailing'];
         if (details) {
             if (details.carCount) {
                 // Use handleCarCountChange to sync vehicleTypes array size first
@@ -127,7 +127,7 @@ const DetailingService = () => {
                     selectedServices: Array.from(new Set([...currentServices, serviceName])),
                     // Initialize carCount to 1 in the global state for this service
                     details: {
-                        [serviceName]: { ...bookingData.details[serviceName], carCount: 1 }
+                        [serviceName]: { ...(bookingData.details?.[serviceName] || {}), carCount: 1 }
                     }
                 });
             } else {
@@ -147,7 +147,7 @@ const DetailingService = () => {
         if (serviceName) {
             updateBooking({
                 details: {
-                    [serviceName]: { ...bookingData.details[serviceName], carCount: numCount }
+                    [serviceName]: { ...(bookingData.details?.[serviceName] || {}), carCount: numCount }
                 }
             });
         }
@@ -196,7 +196,7 @@ const DetailingService = () => {
             details: {
                 ...bookingData.details,
                 'Detailing': {
-                    ...bookingData.details['Detailing'],
+                    ...(bookingData.details?.['Detailing'] || {}),
                     carCount,
                     vehicleTypes,
                     isSemiTruck
