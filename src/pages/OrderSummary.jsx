@@ -21,9 +21,29 @@ const OrderSummary = () => {
     const removeService = (serviceName) => {
         const remaining = bookingData.selectedServices.filter(s => s !== serviceName);
         const newServiceType = bookingData.serviceType === serviceName ? (remaining[0] || '') : bookingData.serviceType;
+
+        // Reverse map of service display names to their add-on keys. detailedBreakdown
+        // in usePricing re-adds anything in bookingData.details.addOns that isn't in
+        // selectedServices, so we must also clear the matching addOn flag here.
+        const addOnKeyMap = {
+            'EV Recharging': ['recharging', 'ev-recharging', 'ev'],
+            'Detailing': ['detailing'],
+            'Maintenance': ['maintenance'],
+            'Mechanic Work': ['mechanic'],
+            'Gas Refueling': ['refueling', 'fuel'],
+            'Paint Correction': ['paint-correction'],
+            'Ceramic Coating': ['coating']
+        };
+
+        const clearedAddOns = { ...(bookingData.details?.addOns || {}) };
+        (addOnKeyMap[serviceName] || []).forEach(key => {
+            clearedAddOns[key] = 0;
+        });
+
         updateBooking({
             selectedServices: remaining,
-            serviceType: newServiceType
+            serviceType: newServiceType,
+            details: { addOns: clearedAddOns }
         });
     };
 
