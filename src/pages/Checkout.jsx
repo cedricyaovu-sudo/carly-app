@@ -9,6 +9,7 @@ import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-
 import { showSuccess, showError } from '../components/ui/Toast';
 import { LoadingOverlay } from '../components/ui/LoadingSpinner';
 import { usePricing } from '../hooks/usePricing';
+import { notifyCeo } from '../lib/notifyCeo';
 
 const CheckoutForm = (props) => {
     const { clientSecret, amount } = props;
@@ -127,9 +128,33 @@ const CheckoutForm = (props) => {
 
                 if (payError) throw payError;
 
-                // 3. Send confirmation email
+                // 3. Send confirmation email to the customer
                 setLoadingMessage('Sending confirmation email...');
                 const emailSent = await sendConfirmationEmail(amount / 100);
+
+                // 4. Notify CEO of the booked appointment + successful checkout.
+                //    These are fire-and-forget so a mail failure never blocks the UI.
+                const baseDetails = {
+                    serviceType: bookingData.serviceType,
+                    location: bookingData.location,
+                    dateTime: bookingData.dateTime,
+                    scheduledTime: bookingData.scheduledTime,
+                    totalAmount: (amount / 100).toFixed(2),
+                    appointmentId: appointment.id,
+                    stripePaymentIntentId: paymentIntent.id,
+                };
+                notifyCeo({
+                    type: 'appointment',
+                    customerEmail: user.email,
+                    customerName: user.user_metadata?.full_name,
+                    details: baseDetails,
+                });
+                notifyCeo({
+                    type: 'checkout',
+                    customerEmail: user.email,
+                    customerName: user.user_metadata?.full_name,
+                    details: baseDetails,
+                });
 
                 if (emailSent) {
                     showSuccess('Booking confirmed! Check your email for details.');
