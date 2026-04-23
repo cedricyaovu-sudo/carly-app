@@ -284,7 +284,7 @@ const CarCollector = () => {
           shadows
           dpr={isMobileLike ? [1, 1.1] : [1, 1.5]}
           gl={{ powerPreference: isMobileLike ? 'low-power' : 'high-performance' }}
-          camera={{ position: [12, 8, 12], fov: isMobileLike ? 60 : 52, near: 0.1, far: 420 }}
+          camera={{ position: [12, 8, 12], fov: isMobileLike ? 68 : 52, near: 0.1, far: 420 }}
         >
           <CarCollectorExperience
             inputRef={inputRef}

@@ -336,6 +336,7 @@ const CarCollectorExperience = ({
   inputRef,
   interactionTick,
   collectedIds,
+  mobileView = false,
   onModeChange,
   onNearbyVehicleChange,
   onVehicleDiscovered,
@@ -470,8 +471,8 @@ const CarCollectorExperience = ({
     }
 
     const cameraTarget = activeVehicle ? activeVehicle.position : actorPositionRef.current;
-    const distance = activeVehicle ? 15 : 10.5;
-    const height = activeVehicle ? 6.2 : 4.6;
+    const distance = activeVehicle ? (mobileView ? 11.5 : 15) : (mobileView ? 7.4 : 10.5);
+    const height = activeVehicle ? (mobileView ? 3.7 : 6.2) : (mobileView ? 2.55 : 4.6);
     const desiredCamera = new THREE.Vector3(
       cameraTarget.x + Math.sin(cameraYawRef.current) * distance,
       cameraTarget.y + height,
@@ -482,7 +483,7 @@ const CarCollectorExperience = ({
 
     const lookAt = new THREE.Vector3(
       cameraTarget.x,
-      cameraTarget.y + (activeVehicle ? 1.5 : 2.0),
+      cameraTarget.y + (activeVehicle ? (mobileView ? 0.95 : 1.5) : (mobileView ? 0.55 : 2.0)),
       cameraTarget.z,
     );
     camera.lookAt(lookAt);
