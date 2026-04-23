@@ -360,6 +360,7 @@ const Onboarding = () => {
                 </div>
               )}
               
+              <div style={{ marginTop: 'auto', transform: 'translateY(-50px)' }}>
               <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -388,8 +389,7 @@ const Onboarding = () => {
                     color: 'white', border: 'none', fontSize: '18px', fontWeight: '700', cursor: (!selections.name || !selections.email || !selections.phone) ? 'not-allowed' : 'pointer',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                     boxShadow: (!selections.name || !selections.email || !selections.phone) ? 'none' : `0 8px 24px ${colors.primary}50`,
-                    opacity: (!selections.name || !selections.email || !selections.phone) ? 0.5 : 1,
-                    marginTop: 'auto'
+                    opacity: (!selections.name || !selections.email || !selections.phone) ? 0.5 : 1
                   }}
                 >
                   Continue <ArrowRight size={20} />
@@ -430,6 +430,7 @@ const Onboarding = () => {
                   </svg>
                   Signup with Google
                 </button>
+              </div>
               </div>
             </motion.div>
           )}
