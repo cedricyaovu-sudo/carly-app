@@ -302,6 +302,23 @@ const Onboarding = () => {
           {/* STEP 2: Contact Info */}
           {step === 2 && (
             <motion.div key="step2" variants={containerVariants} initial="hidden" animate="visible" exit="exit" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1 }}>
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: colors.text,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  width: 'fit-content',
+                  padding: '0',
+                  marginBottom: '24px'
+                }}
+              >
+                <ArrowLeft size={24} />
+              </button>
               <h2 style={{ fontSize: '28px', fontWeight: '800', color: colors.text, marginBottom: '32px', lineHeight: '1.3' }}>
                 Let's get to know you.
               </h2>
