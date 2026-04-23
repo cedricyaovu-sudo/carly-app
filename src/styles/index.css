@@ -102,6 +102,7 @@ a {
 
 /* Utilities */
 .container {
+  width: 100%;
   max-width: 565px;
   /* Mobile-first constraint */
   margin: 0 auto;
@@ -175,6 +176,22 @@ a {
 @media (min-width: 768px) {
   .container {
     max-width: 600px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1180px;
+    padding-left: var(--spacing-xl);
+    padding-right: var(--spacing-xl);
+  }
+
+  .page-content {
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
+    padding-left: var(--spacing-xl);
+    padding-right: var(--spacing-xl);
   }
 }
 
@@ -273,6 +290,12 @@ button:focus:not(:focus-visible) {
   .bottom-nav {
     max-width: 552px;
     /* 600px container - 48px padding */
+  }
+}
+
+@media (min-width: 1024px) {
+  .bottom-nav {
+    max-width: 900px;
   }
 }
 
