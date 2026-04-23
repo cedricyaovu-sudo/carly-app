@@ -69,7 +69,7 @@ const Layout = () => {
                 </div>
                 <h1 style={{ fontSize: 'var(--font-size-lg)', margin: 0, textAlign: 'center', flex: 1 }}>{title}</h1>
                 <div style={{ width: 32, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                    {location.pathname === '/new-service' && (
+                    {location.pathname === '/new-service' && user && (
                         <div
                             onClick={() => navigate('/account')}
                             style={{

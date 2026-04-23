@@ -87,11 +87,13 @@ function App() {
                   <Route path="/review" element={<ReviewPrompt />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/signup" element={<SignUp />} />
+                  <Route element={<Layout />}>
+                    <Route path="/new-service" element={<NewService />} />
+                  </Route>
 
                   {/* OnboardingGuard: requires auth + onboarding_completed */}
                   <Route element={<OnboardingGuard />}>
                     <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-                      <Route path="/new-service" element={<NewService />} />
                       <Route path="/details" element={<ServiceDetails />} />
                       <Route path="/select-date-time" element={<SelectDateTime />} />
                       <Route path="/checkout" element={<Checkout />} />

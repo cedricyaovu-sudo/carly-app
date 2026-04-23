@@ -27,6 +27,9 @@ const formatPhone = (value) => {
   return `(${body.slice(0, 3)}) ${body.slice(3, 6)}-${body.slice(6, 10)}`;
 };
 
+// Keep the paywall/card flow in the codebase so it can be turned back on later.
+const REQUIRE_CARD_AT_ONBOARDING = false;
+
 const Onboarding = () => {
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
@@ -85,8 +88,10 @@ const Onboarding = () => {
     if (isFinishing) return;
     try {
       setIsFinishing(true);
-      // Prefetch the $0.50 verification intent immediately
-      prefetchMembershipIntent(0.50);
+      if (REQUIRE_CARD_AT_ONBOARDING) {
+        // Warm the checkout flow only when onboarding requires a card again.
+        prefetchMembershipIntent(0.50);
+      }
       
       if (user) {
         const { error } = await supabase
@@ -97,11 +102,11 @@ const Onboarding = () => {
         if (error) throw error;
         await refreshProfile();
       }
-      navigate('/paywall');
+      navigate(REQUIRE_CARD_AT_ONBOARDING ? '/paywall' : '/new-service');
     } catch (err) {
       console.error('Error finishing onboarding:', err);
-      // Fallback: still navigate to paywall so user isn't stuck
-      navigate('/paywall');
+      // Fallback: still move the user forward so they aren't stuck.
+      navigate(REQUIRE_CARD_AT_ONBOARDING ? '/paywall' : '/new-service');
     } finally {
       setIsFinishing(false);
     }
@@ -375,7 +380,7 @@ const Onboarding = () => {
                       } catch (e) {
                           console.error("Failed to save lead info", e);
                       }
-                      nextStep();
+                      navigate('/new-service');
                   }}
                   disabled={!selections.name || !selections.email || !selections.phone}
                   style={{
@@ -543,7 +548,7 @@ const Onboarding = () => {
                       boxShadow: '0 8px 24px rgba(0,0,0,0.2)'
                     }}
                   >
-                    See your plan <ChevronRight size={20} />
+                    {REQUIRE_CARD_AT_ONBOARDING ? 'See your plan' : 'Start using GoFuel'} <ChevronRight size={20} />
                   </motion.button>
                 </motion.div>
               )}
