@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { ArrowLeft, CarFront, Coins, MapPinned, Trees } from 'lucide-react';
+import { ArrowLeft, CarFront, ChevronDown, ChevronUp, Coins, MapPinned, Trees } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useGame } from '../../contexts/GameContext';
@@ -47,6 +47,9 @@ const CarCollector = () => {
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [viewportWidth, setViewportWidth] = useState(
     typeof window !== 'undefined' ? window.innerWidth : 1200,
+  );
+  const [instructionsMinimized, setInstructionsMinimized] = useState(
+    typeof window !== 'undefined' ? window.innerWidth < 640 : false,
   );
   const inputRef = useRef(defaultInput);
 
@@ -151,6 +154,12 @@ const CarCollector = () => {
     if (nearbyVehicle) return `Walk up to ${nearbyVehicle.name} and interact to jump in.`;
     return 'Explore the map and walk up to a parked car to collect it.';
   }, [mode, nearbyVehicle]);
+
+  const helperLabel = instructionsMinimized
+    ? nearbyVehicle
+      ? `Near ${nearbyVehicle.name}`
+      : 'Tap expand for help'
+    : interactionLabel;
 
   return (
     <div
@@ -275,12 +284,13 @@ const CarCollector = () => {
           shadows
           dpr={isMobileLike ? [1, 1.1] : [1, 1.5]}
           gl={{ powerPreference: isMobileLike ? 'low-power' : 'high-performance' }}
-          camera={{ position: [12, 8, 12], fov: 52, near: 0.1, far: 420 }}
+          camera={{ position: [12, 8, 12], fov: isMobileLike ? 60 : 52, near: 0.1, far: 420 }}
         >
           <CarCollectorExperience
             inputRef={inputRef}
             interactionTick={interactionTick}
             collectedIds={collectedIds}
+            mobileView={isMobileLike}
             onModeChange={setMode}
             onNearbyVehicleChange={setNearbyVehicle}
             onVehicleDiscovered={handleVehicleDiscovered}
@@ -292,9 +302,11 @@ const CarCollector = () => {
             position: 'absolute',
             top: '12px',
             left: '12px',
-            right: isCompactMobile ? '12px' : 'auto',
-            maxWidth: isCompactMobile ? 'none' : isMobileLike ? '72%' : '360px',
-            padding: isCompactMobile ? '10px 12px' : '12px 14px',
+            right: isCompactMobile && !instructionsMinimized ? '12px' : 'auto',
+            maxWidth: instructionsMinimized ? 'fit-content' : isCompactMobile ? 'none' : isMobileLike ? '72%' : '360px',
+            padding: instructionsMinimized
+              ? (isCompactMobile ? '8px 10px' : '9px 11px')
+              : (isCompactMobile ? '10px 12px' : '12px 14px'),
             borderRadius: '16px',
             background: 'rgba(15, 23, 42, 0.72)',
             color: 'white',
@@ -303,37 +315,80 @@ const CarCollector = () => {
             WebkitBackdropFilter: 'blur(10px)',
           }}
         >
-          <div style={{ fontSize: '12px', fontWeight: '800', letterSpacing: '0.04em', color: '#67e8f9' }}>
-            OBJECTIVE
-          </div>
           <div
             style={{
-              marginTop: '6px',
-              fontSize: isCompactMobile ? '14px' : '15px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '10px',
+            }}
+          >
+            <div style={{ fontSize: '12px', fontWeight: '800', letterSpacing: '0.04em', color: '#67e8f9' }}>
+              OBJECTIVE
+            </div>
+            <button
+              type="button"
+              onClick={() => setInstructionsMinimized((value) => !value)}
+              style={{
+                border: '1px solid rgba(255,255,255,0.16)',
+                background: 'rgba(255,255,255,0.08)',
+                color: 'white',
+                borderRadius: '999px',
+                minHeight: '32px',
+                minWidth: instructionsMinimized ? '92px' : '32px',
+                padding: instructionsMinimized ? '0 12px' : '0',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                cursor: 'pointer',
+                flexShrink: 0,
+                fontSize: '12px',
+                fontWeight: '700',
+              }}
+            >
+              {instructionsMinimized ? (
+                <>
+                  <span>Expand</span>
+                  <ChevronDown size={14} />
+                </>
+              ) : (
+                <ChevronUp size={14} />
+              )}
+            </button>
+          </div>
+
+          <div
+            style={{
+              marginTop: instructionsMinimized ? '4px' : '6px',
+              fontSize: isCompactMobile ? '13px' : '15px',
               fontWeight: '700',
-              lineHeight: 1.45,
+              lineHeight: 1.35,
             }}
           >
-            {interactionLabel}
+            {helperLabel}
           </div>
-          <div
-            style={{
-              marginTop: '8px',
-              fontSize: isCompactMobile ? '12px' : '13px',
-              color: 'rgba(255,255,255,0.82)',
-              lineHeight: 1.45,
-            }}
-          >
-            {isMobileLike
-              ? 'Use the on-screen controls to move, rotate the camera, and enter or exit vehicles.'
-              : 'WASD or arrow keys move, Q/R rotate the camera, Shift boosts on foot, and E/Space/Enter enters or exits a car.'}
-          </div>
+
+          {!instructionsMinimized && (
+            <div
+              style={{
+                marginTop: '8px',
+                fontSize: isCompactMobile ? '12px' : '13px',
+                color: 'rgba(255,255,255,0.82)',
+                lineHeight: 1.45,
+              }}
+            >
+              {isMobileLike
+                ? 'Use the on-screen controls to move, rotate the camera, and enter or exit vehicles.'
+                : 'WASD or arrow keys move, Q/R rotate the camera, Shift boosts on foot, and E/Space/Enter enters or exits a car.'}
+            </div>
+          )}
         </div>
 
         <div
           style={{
             position: 'absolute',
-            top: isCompactMobile ? '118px' : '12px',
+            top: isCompactMobile ? (instructionsMinimized ? '58px' : '118px') : '12px',
             right: '12px',
             left: isCompactMobile ? '12px' : 'auto',
             display: 'flex',
