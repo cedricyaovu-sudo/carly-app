@@ -3,6 +3,38 @@ import { supabase } from '../lib/supabase';
 
 const AuthContext = createContext({});
 
+const syncLeadForUser = async (sessionUser, accessToken) => {
+    const email = sessionUser?.email?.trim().toLowerCase();
+    if (!email || !accessToken) return;
+
+    const name =
+        sessionUser?.user_metadata?.full_name ||
+        sessionUser?.user_metadata?.name ||
+        null;
+    const phone =
+        sessionUser?.phone ||
+        sessionUser?.user_metadata?.phone_number ||
+        sessionUser?.user_metadata?.phone ||
+        null;
+
+    try {
+        await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sync-lead`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({
+                email,
+                name,
+                phone,
+            }),
+        });
+    } catch (err) {
+        console.error('Lead sync failed:', err);
+    }
+};
+
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
@@ -32,6 +64,7 @@ export const AuthProvider = ({ children }) => {
                 const currentUser = session?.user ?? null;
                 setUser(currentUser);
                 if (currentUser) {
+                    await syncLeadForUser(currentUser, session?.access_token);
                     await fetchProfile(currentUser.id);
                 }
             })
@@ -49,7 +82,10 @@ export const AuthProvider = ({ children }) => {
             setUser(currentUser);
             
             if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
-                if (currentUser) fetchProfile(currentUser.id);
+                if (currentUser) {
+                    syncLeadForUser(currentUser, session?.access_token);
+                    fetchProfile(currentUser.id);
+                }
             } else if (event === 'SIGNED_OUT') {
                 setProfile(null);
             }
