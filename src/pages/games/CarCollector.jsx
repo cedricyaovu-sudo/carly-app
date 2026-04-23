@@ -45,7 +45,13 @@ const CarCollector = () => {
   const [inputState, setInputState] = useState(defaultInput);
   const [collectedIds, setCollectedIds] = useState([]);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [viewportWidth, setViewportWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 1200,
+  );
   const inputRef = useRef(defaultInput);
+
+  const isCompactMobile = viewportWidth < 640;
+  const isMobileLike = isTouchDevice || viewportWidth < 900;
 
   const theme = {
     pageBg: isDarkMode ? 'var(--color-background)' : '#eef6ff',
@@ -73,15 +79,18 @@ const CarCollector = () => {
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(pointer: coarse)');
-    const updateTouchMode = () => setIsTouchDevice(mediaQuery.matches || window.innerWidth < 900);
+    const updateViewport = () => {
+      setViewportWidth(window.innerWidth);
+      setIsTouchDevice(mediaQuery.matches || window.innerWidth < 900);
+    };
 
-    updateTouchMode();
-    mediaQuery.addEventListener?.('change', updateTouchMode);
-    window.addEventListener('resize', updateTouchMode);
+    updateViewport();
+    mediaQuery.addEventListener?.('change', updateViewport);
+    window.addEventListener('resize', updateViewport);
 
     return () => {
-      mediaQuery.removeEventListener?.('change', updateTouchMode);
-      window.removeEventListener('resize', updateTouchMode);
+      mediaQuery.removeEventListener?.('change', updateViewport);
+      window.removeEventListener('resize', updateViewport);
     };
   }, []);
 
@@ -138,14 +147,27 @@ const CarCollector = () => {
 
   const progressLabel = `${collectedIds.length}/${VEHICLE_SPAWNS.length} cars collected`;
   const interactionLabel = useMemo(() => {
-    if (mode === 'driving') return 'Press E, Space, or Enter to exit your car.';
-    if (nearbyVehicle) return `Press E, Space, or Enter to hop into ${nearbyVehicle.name}.`;
+    if (mode === 'driving') return 'Tap or press the interact button to exit your car.';
+    if (nearbyVehicle) return `Walk up to ${nearbyVehicle.name} and interact to jump in.`;
     return 'Explore the map and walk up to a parked car to collect it.';
   }, [mode, nearbyVehicle]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '96px' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: isCompactMobile ? '12px' : '16px',
+        paddingBottom: isCompactMobile ? '112px' : '96px',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '10px',
+        }}
+      >
         <button
           onClick={() => navigate('/games')}
           style={{
@@ -158,16 +180,31 @@ const CarCollector = () => {
             alignItems: 'center',
             justifyContent: 'center',
             marginTop: '3px',
+            flexShrink: 0,
           }}
         >
           <ArrowLeft size={24} />
         </button>
 
-        <div style={{ flex: 1 }}>
-          <h2 style={{ fontSize: '24px', fontWeight: '800', color: theme.text, margin: 0 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <h2
+            style={{
+              fontSize: isCompactMobile ? '22px' : '24px',
+              fontWeight: '800',
+              color: theme.text,
+              margin: 0,
+            }}
+          >
             Car Collector
           </h2>
-          <p style={{ margin: '6px 0 0', color: theme.textMuted, lineHeight: 1.5 }}>
+          <p
+            style={{
+              margin: '6px 0 0',
+              color: theme.textMuted,
+              lineHeight: 1.5,
+              fontSize: isCompactMobile ? '14px' : '15px',
+            }}
+          >
             Roam a 3D city-and-park world on foot, jump into unique cars, and collect every ride.
           </p>
         </div>
@@ -176,7 +213,9 @@ const CarCollector = () => {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))',
+          gridTemplateColumns: isCompactMobile
+            ? 'repeat(2, minmax(0, 1fr))'
+            : 'repeat(auto-fit, minmax(170px, 1fr))',
           gap: '12px',
         }}
       >
@@ -192,19 +231,30 @@ const CarCollector = () => {
               background: theme.card,
               border: `1px solid ${theme.border}`,
               borderRadius: '18px',
-              padding: '14px 16px',
+              padding: isCompactMobile ? '12px 13px' : '14px 16px',
               display: 'flex',
               flexDirection: 'column',
               gap: '8px',
               backdropFilter: 'blur(10px)',
               WebkitBackdropFilter: 'blur(10px)',
+              minWidth: 0,
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: theme.accent }}>
               {card.icon}
-              <span style={{ color: theme.textMuted, fontSize: '13px', fontWeight: '700' }}>{card.title}</span>
+              <span style={{ color: theme.textMuted, fontSize: '12px', fontWeight: '700' }}>{card.title}</span>
             </div>
-            <div style={{ color: theme.text, fontSize: '18px', fontWeight: '800' }}>{card.value}</div>
+            <div
+              style={{
+                color: theme.text,
+                fontSize: isCompactMobile ? '15px' : '18px',
+                fontWeight: '800',
+                lineHeight: 1.3,
+                wordBreak: 'break-word',
+              }}
+            >
+              {card.value}
+            </div>
           </div>
         ))}
       </div>
@@ -213,18 +263,18 @@ const CarCollector = () => {
         style={{
           position: 'relative',
           background: `linear-gradient(180deg, ${theme.pageBg} 0%, rgba(0, 194, 203, 0.14) 100%)`,
-          borderRadius: '24px',
+          borderRadius: isCompactMobile ? '20px' : '24px',
           border: `1px solid ${theme.border}`,
           overflow: 'hidden',
-          minHeight: isTouchDevice ? '68vh' : '72vh',
+          minHeight: isCompactMobile ? '58dvh' : isMobileLike ? '66vh' : '72vh',
           boxShadow: '0 18px 40px rgba(15, 23, 42, 0.14)',
         }}
         onContextMenu={(event) => event.preventDefault()}
       >
         <Canvas
           shadows
-          dpr={isTouchDevice ? [1, 1.1] : [1, 1.5]}
-          gl={{ powerPreference: isTouchDevice ? 'low-power' : 'high-performance' }}
+          dpr={isMobileLike ? [1, 1.1] : [1, 1.5]}
+          gl={{ powerPreference: isMobileLike ? 'low-power' : 'high-performance' }}
           camera={{ position: [12, 8, 12], fov: 52, near: 0.1, far: 420 }}
         >
           <CarCollectorExperience
@@ -240,10 +290,11 @@ const CarCollector = () => {
         <div
           style={{
             position: 'absolute',
-            top: '14px',
-            left: '14px',
-            maxWidth: isTouchDevice ? '72%' : '360px',
-            padding: '12px 14px',
+            top: '12px',
+            left: '12px',
+            right: isCompactMobile ? '12px' : 'auto',
+            maxWidth: isCompactMobile ? 'none' : isMobileLike ? '72%' : '360px',
+            padding: isCompactMobile ? '10px 12px' : '12px 14px',
             borderRadius: '16px',
             background: 'rgba(15, 23, 42, 0.72)',
             color: 'white',
@@ -252,14 +303,28 @@ const CarCollector = () => {
             WebkitBackdropFilter: 'blur(10px)',
           }}
         >
-          <div style={{ fontSize: '13px', fontWeight: '800', letterSpacing: '0.04em', color: '#67e8f9' }}>
+          <div style={{ fontSize: '12px', fontWeight: '800', letterSpacing: '0.04em', color: '#67e8f9' }}>
             OBJECTIVE
           </div>
-          <div style={{ marginTop: '6px', fontSize: '15px', fontWeight: '700', lineHeight: 1.45 }}>
+          <div
+            style={{
+              marginTop: '6px',
+              fontSize: isCompactMobile ? '14px' : '15px',
+              fontWeight: '700',
+              lineHeight: 1.45,
+            }}
+          >
             {interactionLabel}
           </div>
-          <div style={{ marginTop: '10px', fontSize: '13px', color: 'rgba(255,255,255,0.82)', lineHeight: 1.55 }}>
-            {isTouchDevice
+          <div
+            style={{
+              marginTop: '8px',
+              fontSize: isCompactMobile ? '12px' : '13px',
+              color: 'rgba(255,255,255,0.82)',
+              lineHeight: 1.45,
+            }}
+          >
+            {isMobileLike
               ? 'Use the on-screen controls to move, rotate the camera, and enter or exit vehicles.'
               : 'WASD or arrow keys move, Q/R rotate the camera, Shift boosts on foot, and E/Space/Enter enters or exits a car.'}
           </div>
@@ -268,12 +333,15 @@ const CarCollector = () => {
         <div
           style={{
             position: 'absolute',
-            top: '14px',
-            right: '14px',
+            top: isCompactMobile ? '118px' : '12px',
+            right: '12px',
+            left: isCompactMobile ? '12px' : 'auto',
             display: 'flex',
-            flexDirection: 'column',
+            flexDirection: isCompactMobile ? 'row' : 'column',
+            flexWrap: isCompactMobile ? 'wrap' : 'nowrap',
+            justifyContent: isCompactMobile ? 'flex-start' : 'stretch',
             gap: '8px',
-            width: isTouchDevice ? '118px' : '150px',
+            width: isCompactMobile ? 'auto' : isMobileLike ? '118px' : '150px',
           }}
         >
           {WORLD_ZONES.map((zone) => (
@@ -283,7 +351,7 @@ const CarCollector = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '8px 10px',
+                padding: isCompactMobile ? '7px 9px' : '8px 10px',
                 borderRadius: '14px',
                 background: 'rgba(255,255,255,0.84)',
                 border: '1px solid rgba(148, 163, 184, 0.24)',
@@ -306,12 +374,13 @@ const CarCollector = () => {
           ))}
         </div>
 
-        {isTouchDevice && (
+        {isMobileLike && (
           <MobileControls
             onInteract={() => setInteractionTick((value) => value + 1)}
             setControl={handleSetControl}
             canInteract={Boolean(nearbyVehicle) || mode === 'driving'}
             mode={mode}
+            compact={isCompactMobile}
           />
         )}
       </div>
@@ -321,7 +390,7 @@ const CarCollector = () => {
           background: theme.card,
           border: `1px solid ${theme.border}`,
           borderRadius: '20px',
-          padding: '16px 18px',
+          padding: isCompactMobile ? '14px' : '16px 18px',
           backdropFilter: 'blur(10px)',
           WebkitBackdropFilter: 'blur(10px)',
         }}
@@ -329,7 +398,15 @@ const CarCollector = () => {
         <div style={{ color: theme.text, fontSize: '16px', fontWeight: '800', marginBottom: '10px' }}>
           Garage Progress
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: isCompactMobile
+              ? 'repeat(2, minmax(0, 1fr))'
+              : 'repeat(auto-fit, minmax(160px, 1fr))',
+            gap: '10px',
+          }}
+        >
           {VEHICLE_SPAWNS.map((vehicle) => {
             const collected = collectedIds.includes(vehicle.id);
             return (
@@ -344,10 +421,20 @@ const CarCollector = () => {
                       ? 'rgba(15, 23, 42, 0.72)'
                       : 'rgba(241, 245, 249, 0.92)',
                   border: `1px solid ${collected ? 'rgba(0, 194, 203, 0.34)' : theme.border}`,
+                  minWidth: 0,
                 }}
               >
-                <div style={{ color: theme.text, fontWeight: '800', marginBottom: '4px' }}>{vehicle.name}</div>
-                <div style={{ color: theme.textMuted, fontSize: '13px', marginBottom: '6px' }}>{vehicle.zone}</div>
+                <div
+                  style={{
+                    color: theme.text,
+                    fontWeight: '800',
+                    marginBottom: '4px',
+                    fontSize: isCompactMobile ? '14px' : '15px',
+                  }}
+                >
+                  {vehicle.name}
+                </div>
+                <div style={{ color: theme.textMuted, fontSize: '12px', marginBottom: '6px' }}>{vehicle.zone}</div>
                 <div style={{ color: collected ? '#0891b2' : theme.textMuted, fontSize: '12px', fontWeight: '700' }}>
                   {collected ? 'Collected' : `Worth $${DISCOVERY_REWARD}`}
                 </div>

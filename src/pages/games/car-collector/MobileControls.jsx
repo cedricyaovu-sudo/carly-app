@@ -25,14 +25,22 @@ const pressHandlers = (name, setControl) => ({
   onPointerCancel: () => setControl(name, false),
 });
 
-const MobileControls = ({ onInteract, setControl, canInteract, mode }) => {
+const MobileControls = ({ onInteract, setControl, canInteract, mode, compact = false }) => {
+  const moveSize = compact ? 52 : 60;
+  const cameraWidth = compact ? 60 : 72;
+  const cameraHeight = compact ? 46 : 52;
+  const actionWidth = compact ? 142 : 160;
+  const actionHeight = compact ? 50 : 56;
+
   return (
     <div
       style={{
         position: 'absolute',
         inset: 0,
         pointerEvents: 'none',
-        padding: '16px',
+        padding: compact
+          ? '12px 12px calc(12px + env(safe-area-inset-bottom, 0px))'
+          : '16px 16px calc(16px + env(safe-area-inset-bottom, 0px))',
         display: 'flex',
         alignItems: 'flex-end',
         justifyContent: 'space-between',
@@ -42,9 +50,9 @@ const MobileControls = ({ onInteract, setControl, canInteract, mode }) => {
         style={{
           pointerEvents: 'auto',
           display: 'grid',
-          gridTemplateColumns: '60px 60px 60px',
-          gridTemplateRows: '60px 60px 60px',
-          gap: '8px',
+          gridTemplateColumns: `${moveSize}px ${moveSize}px ${moveSize}px`,
+          gridTemplateRows: `${moveSize}px ${moveSize}px ${moveSize}px`,
+          gap: compact ? '6px' : '8px',
           alignItems: 'center',
         }}
       >
@@ -52,7 +60,15 @@ const MobileControls = ({ onInteract, setControl, canInteract, mode }) => {
         <button style={{ ...buttonBase }} {...pressHandlers('forward', setControl)}>W</button>
         <div />
         <button style={{ ...buttonBase }} {...pressHandlers('left', setControl)}>A</button>
-        <div style={{ ...buttonBase, background: 'rgba(15, 23, 42, 0.45)' }}>MOVE</div>
+        <div
+          style={{
+            ...buttonBase,
+            background: 'rgba(15, 23, 42, 0.45)',
+            fontSize: compact ? '10px' : '12px',
+          }}
+        >
+          MOVE
+        </div>
         <button style={{ ...buttonBase }} {...pressHandlers('right', setControl)}>D</button>
         <div />
         <button style={{ ...buttonBase }} {...pressHandlers('backward', setControl)}>S</button>
@@ -64,20 +80,20 @@ const MobileControls = ({ onInteract, setControl, canInteract, mode }) => {
           pointerEvents: 'auto',
           display: 'flex',
           flexDirection: 'column',
-          gap: '10px',
+          gap: compact ? '8px' : '10px',
           alignItems: 'flex-end',
-          maxWidth: '46%',
+          maxWidth: compact ? '48%' : '46%',
         }}
       >
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: compact ? '8px' : '10px' }}>
           <button
-            style={{ ...buttonBase, width: '72px', height: '52px' }}
+            style={{ ...buttonBase, width: `${cameraWidth}px`, height: `${cameraHeight}px`, fontSize: compact ? '10px' : '12px' }}
             {...pressHandlers('cameraLeft', setControl)}
           >
             CAM L
           </button>
           <button
-            style={{ ...buttonBase, width: '72px', height: '52px' }}
+            style={{ ...buttonBase, width: `${cameraWidth}px`, height: `${cameraHeight}px`, fontSize: compact ? '10px' : '12px' }}
             {...pressHandlers('cameraRight', setControl)}
           >
             CAM R
@@ -89,11 +105,12 @@ const MobileControls = ({ onInteract, setControl, canInteract, mode }) => {
           onClick={onInteract}
           style={{
             ...buttonBase,
-            width: '160px',
-            minHeight: '56px',
-            padding: '0 18px',
+            width: `${actionWidth}px`,
+            minHeight: `${actionHeight}px`,
+            padding: compact ? '0 14px' : '0 18px',
             background: canInteract ? 'rgba(0, 194, 203, 0.92)' : 'rgba(15, 23, 42, 0.72)',
             borderColor: canInteract ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.14)',
+            fontSize: compact ? '12px' : '13px',
           }}
         >
           {mode === 'driving' ? 'EXIT CAR' : canInteract ? 'ENTER CAR' : 'SEARCHING...'}
