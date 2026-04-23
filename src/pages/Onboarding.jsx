@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ArrowRight, ShieldCheck, Fuel, Wrench, Sparkles, CheckCircle2 } from 'lucide-react';
+import { ChevronRight, ArrowLeft, ArrowRight, ShieldCheck, Fuel, Wrench, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { usePayment } from '../contexts/PaymentContext';
