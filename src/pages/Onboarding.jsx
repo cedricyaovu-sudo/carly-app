@@ -7,6 +7,26 @@ import { useAuth } from '../contexts/AuthContext';
 import { usePayment } from '../contexts/PaymentContext';
 import { supabase } from '../lib/supabase';
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+const digitsOnly = (value) => (value || '').replace(/\D/g, '');
+
+const isValidName = (value) => (value || '').trim().length >= 2;
+const isValidEmail = (value) => EMAIL_REGEX.test((value || '').trim());
+const isValidPhone = (value) => {
+  const digits = digitsOnly(value);
+  return digits.length === 10 || (digits.length === 11 && digits.startsWith('1'));
+};
+
+const formatPhone = (value) => {
+  const d = digitsOnly(value).slice(0, 11);
+  const body = d.length === 11 && d.startsWith('1') ? d.slice(1) : d;
+  if (body.length === 0) return '';
+  if (body.length < 4) return `(${body}`;
+  if (body.length < 7) return `(${body.slice(0, 3)}) ${body.slice(3)}`;
+  return `(${body.slice(0, 3)}) ${body.slice(3, 6)}-${body.slice(6, 10)}`;
+};
+
 const Onboarding = () => {
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
@@ -15,6 +35,12 @@ const Onboarding = () => {
   const [step, setStep] = useState(1);
   const [loadingComplete, setLoadingComplete] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
+  const [contactTouched, setContactTouched] = useState({
+    name: false,
+    email: false,
+    phone: false
+  });
+  const [contactError, setContactError] = useState('');
 
   // Form selections (we don't strictly need to save them, but it builds the personalized feel)
   const [selections, setSelections] = useState({
@@ -36,6 +62,14 @@ const Onboarding = () => {
     // Add a slight delay for aesthetic feel before moving to next step
     setTimeout(nextStep, 300);
   };
+
+  const contactFieldErrors = {
+    name: isValidName(selections.name) ? '' : 'Please enter a valid name.',
+    email: isValidEmail(selections.email) ? '' : 'Please enter a valid email address.',
+    phone: isValidPhone(selections.phone) ? '' : 'Please enter a valid phone number.'
+  };
+
+  const contactFormValid = Object.values(contactFieldErrors).every(msg => msg === '');
 
   useEffect(() => {
     if (step === 9) {
@@ -81,6 +115,16 @@ const Onboarding = () => {
     primary: '#00C2CB',
     card: isDarkMode ? '#1E293B' : '#FFFFFF',
     border: isDarkMode ? '#334155' : '#E2E8F0',
+  };
+
+  const contactInputStyle = {
+    width: '100%',
+    padding: '16px',
+    borderRadius: '12px',
+    background: 'transparent',
+    color: colors.text,
+    marginBottom: '16px',
+    fontSize: '16px'
   };
 
   const containerVariants = {
@@ -241,45 +285,82 @@ const Onboarding = () => {
               <h2 style={{ fontSize: '28px', fontWeight: '800', color: colors.text, marginBottom: '32px', lineHeight: '1.3' }}>
                 Let's get to know you.
               </h2>
+              {contactError && (
+                <div style={{
+                  background: '#FEE2E2',
+                  color: '#DC2626',
+                  padding: '12px',
+                  borderRadius: '12px',
+                  marginBottom: '16px',
+                  fontSize: '14px'
+                }}>
+                  {contactError}
+                </div>
+              )}
               <input 
                 type="text" 
                 placeholder="Full Name" 
                 value={selections.name}
                 onChange={e => setSelections(prev => ({...prev, name: e.target.value}))}
-                style={{ width: '100%', padding: '16px', borderRadius: '12px', border: `1px solid ${colors.border}`, background: 'transparent', color: colors.text, marginBottom: '16px', fontSize: '16px' }}
+                onBlur={() => setContactTouched(prev => ({ ...prev, name: true }))}
+                aria-invalid={Boolean(contactTouched.name && contactFieldErrors.name)}
+                style={{ ...contactInputStyle, border: `1px solid ${contactTouched.name && contactFieldErrors.name ? '#DC2626' : colors.border}` }}
               />
+              {contactTouched.name && contactFieldErrors.name && (
+                <div style={{ color: '#DC2626', fontSize: '13px', marginTop: '-8px', marginBottom: '12px' }}>
+                  {contactFieldErrors.name}
+                </div>
+              )}
               <input 
                 type="email" 
                 placeholder="Email Address" 
                 value={selections.email}
                 onChange={e => setSelections(prev => ({...prev, email: e.target.value}))}
-                style={{ width: '100%', padding: '16px', borderRadius: '12px', border: `1px solid ${colors.border}`, background: 'transparent', color: colors.text, marginBottom: '16px', fontSize: '16px' }}
+                onBlur={() => setContactTouched(prev => ({ ...prev, email: true }))}
+                aria-invalid={Boolean(contactTouched.email && contactFieldErrors.email)}
+                style={{ ...contactInputStyle, border: `1px solid ${contactTouched.email && contactFieldErrors.email ? '#DC2626' : colors.border}` }}
               />
+              {contactTouched.email && contactFieldErrors.email && (
+                <div style={{ color: '#DC2626', fontSize: '13px', marginTop: '-8px', marginBottom: '12px' }}>
+                  {contactFieldErrors.email}
+                </div>
+              )}
               <input 
                 type="tel" 
                 placeholder="Phone Number" 
                 value={selections.phone}
-                onChange={e => setSelections(prev => ({...prev, phone: e.target.value}))}
-                style={{ width: '100%', padding: '16px', borderRadius: '12px', border: `1px solid ${colors.border}`, background: 'transparent', color: colors.text, marginBottom: '32px', fontSize: '16px' }}
+                onChange={e => setSelections(prev => ({...prev, phone: formatPhone(e.target.value)}))}
+                onBlur={() => setContactTouched(prev => ({ ...prev, phone: true }))}
+                aria-invalid={Boolean(contactTouched.phone && contactFieldErrors.phone)}
+                style={{ ...contactInputStyle, border: `1px solid ${contactTouched.phone && contactFieldErrors.phone ? '#DC2626' : colors.border}`, marginBottom: '32px' }}
               />
+              {contactTouched.phone && contactFieldErrors.phone && (
+                <div style={{ color: '#DC2626', fontSize: '13px', marginTop: '-24px', marginBottom: '20px' }}>
+                  {contactFieldErrors.phone}
+                </div>
+              )}
               
               <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={async () => {
-                      if (selections.name && selections.email && selections.phone) {
-                          try {
-                              // Save lead immediately
-                              await supabase.from('leads').insert({
-                                  name: selections.name,
-                                  email: selections.email,
-                                  phone: selections.phone
-                              });
-                          } catch (e) {
-                              console.error("Failed to save lead info", e);
-                          }
-                          nextStep();
+                      setContactError('');
+                      setContactTouched({ name: true, email: true, phone: true });
+                      if (!contactFormValid) {
+                          setContactError('Please fix the highlighted fields and try again.');
+                          return;
                       }
+                      try {
+                          // Save lead immediately
+                          await supabase.from('leads').insert({
+                              name: selections.name.trim(),
+                              email: selections.email.trim().toLowerCase(),
+                              phone: selections.phone
+                          });
+                      } catch (e) {
+                          console.error("Failed to save lead info", e);
+                      }
+                      nextStep();
                   }}
                   disabled={!selections.name || !selections.email || !selections.phone}
                   style={{
