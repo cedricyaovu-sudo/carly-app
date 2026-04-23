@@ -1,3 +1,4 @@
+import { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { BookingProvider } from './contexts/BookingContext';
@@ -50,6 +51,8 @@ import PaywallCheckout from './pages/PaywallCheckout';
 import ForgotPassword from './pages/ForgotPassword';
 import ReviewPrompt from './pages/ReviewPrompt';
 import PostCheckoutSuccess from './pages/PostCheckoutSuccess';
+
+const CarCollector = lazy(() => import('./pages/games/CarCollector'));
 
 const OnboardingGuard = () => {
   const { user, profile, loading } = useAuth();
@@ -123,6 +126,14 @@ function App() {
                       <Route path="/games/simulator" element={<MechanicSimulator />} />
                       <Route path="/games/racer" element={<CarRacer />} />
                       <Route path="/games/trivia" element={<CarTrivia />} />
+                      <Route
+                        path="/games/car-collector"
+                        element={
+                          <Suspense fallback={<LoadingOverlay />}>
+                            <CarCollector />
+                          </Suspense>
+                        }
+                      />
                     </Route>
                   </Route>
 

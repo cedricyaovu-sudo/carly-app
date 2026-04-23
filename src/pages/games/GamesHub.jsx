@@ -1,4 +1,4 @@
-import { Trophy, Car, Users, Wrench, Navigation, HelpCircle } from 'lucide-react';
+import { Trophy, Car, Users, Navigation, HelpCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useGame } from '../../contexts/GameContext';
@@ -19,6 +19,15 @@ const GamesHub = () => {
     };
 
     const games = [
+        {
+            id: 'car-collector',
+            title: 'Car Collector',
+            desc: 'Explore a 3D open world, walk the map, and collect unique cars.',
+            icon: <Car size={20} color="white" />,
+            color: '#00C2CB',
+            path: '/games/car-collector',
+            banner: '/car-collector-banner.svg'
+        },
         {
             id: 'racer',
             title: 'Highway Racer',
